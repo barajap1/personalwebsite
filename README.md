@@ -1,4 +1,4 @@
-# personalwebsite
+# Personal website
 
 My personal Website located here: https://pablobarajas.netlify.com/
 
