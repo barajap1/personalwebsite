@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+
+<meta itemprop="name" content="Peer Influence for a music-streaming company">
+<meta itemprop="description" content="Peer Influence for a music-streaming company# Load relevant packageslibrary(dplyr)library(ggplot2)library(corrplot)library(MatchIt)library(psych)library(GGally)library(gridExtra)#read the datasetHigh_Note &lt;- read.csv(&quot;Data/peer_influence.csv&quot;, header = TRUE)describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)## ## Descriptive statistics by group ## group: 0## vars n mean sd median trimmed## ï..ID 1 40300 20150.50 11633.75 20150.50 20150.50## age 2 40300 23.95 6.37 23.00 23.09## male 3 40300 0.">
+
+
+<meta itemprop="datePublished" content="2019-04-16T21:13:14-05:00" />
+<meta itemprop="dateModified" content="2019-04-16T21:13:14-05:00" />
+<meta itemprop="wordCount" content="4687">
+
+
+
+<meta itemprop="keywords" content="R Markdown,plot,Propensity Score matching&#34;," />
+<meta property="og:title" content="Peer Influence for a music-streaming company" />
+<meta property="og:description" content="Peer Influence for a music-streaming company# Load relevant packageslibrary(dplyr)library(ggplot2)library(corrplot)library(MatchIt)library(psych)library(GGally)library(gridExtra)#read the datasetHigh_Note &lt;- read.csv(&quot;Data/peer_influence.csv&quot;, header = TRUE)describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)## ## Descriptive statistics by group ## group: 0## vars n mean sd median trimmed## ï..ID 1 40300 20150.50 11633.75 20150.50 20150.50## age 2 40300 23.95 6.37 23.00 23.09## male 3 40300 0." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/peer_influence/" />
+<meta property="article:published_time" content="2019-04-16T21:13:14-05:00"/>
+<meta property="article:modified_time" content="2019-04-16T21:13:14-05:00"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Peer Influence for a music-streaming company"/>
+<meta name="twitter:description" content="Peer Influence for a music-streaming company# Load relevant packageslibrary(dplyr)library(ggplot2)library(corrplot)library(MatchIt)library(psych)library(GGally)library(gridExtra)#read the datasetHigh_Note &lt;- read.csv(&quot;Data/peer_influence.csv&quot;, header = TRUE)describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)## ## Descriptive statistics by group ## group: 0## vars n mean sd median trimmed## ï..ID 1 40300 20150.50 11633.75 20150.50 20150.50## age 2 40300 23.95 6.37 23.00 23.09## male 3 40300 0."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Peer Influence for a music-streaming company</title>
+	<link rel="stylesheet" href="/css/style.min.5ee5e7976cd09872c64e40a582206543f6aa38c69a8c43898aadc70040344b92.css" integrity="sha256-XuXnl2zQmHLGTkClgiBlQ/aqOMaajEOJiq3HAEA0S5I=" crossorigin="anonymous">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">Pablo Barajas</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					
+				<a href="/posts/">Posts</a>
+				<a href="/about-hugo/">About</a>
+				<a href="/blog/">Blog</a>
+
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://www.linkedin.com/in/pabloibarajas/" target="_blank" rel="noopener me" title="Linkedin"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a><a href="mailto:bar09028@gmail.com" target="_blank" rel="noopener me" title="Email"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a><a href="https://github.com/barajap1" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+			<li><a href="/about-hugo/">About</a></li>
+			<li><a href="/blog/">Blog</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Apr 16, 2019</span></div>
+				<h1>Peer Influence for a music-streaming company</h1>
+			</header>
+			<div class="content">
+				
+
+
+<div id="peer-influence-for-a-music-streaming-company" class="section level2">
+<h2>Peer Influence for a music-streaming company</h2>
+<pre class="r"><code># Load relevant packages
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(MatchIt)
+library(psych)
+library(GGally)
+library(gridExtra)</code></pre>
+<pre class="r"><code>#read the dataset
+High_Note &lt;- read.csv(&quot;Data/peer_influence.csv&quot;, header = TRUE)</code></pre>
+<pre class="r"><code>describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)</code></pre>
+<pre><code>## 
+##  Descriptive statistics by group 
+## group: 0
+##                       vars     n     mean       sd   median  trimmed
+## ï..ID                    1 40300 20150.50 11633.75 20150.50 20150.50
+## age                      2 40300    23.95     6.37    23.00    23.09
+## male                     3 40300     0.62     0.48     1.00     0.65
+## friend_cnt               4 40300    18.49    57.48     7.00    10.28
+## avg_friend_age           5 40300    24.01     5.10    23.00    23.40
+## avg_friend_male          6 40300     0.62     0.32     0.67     0.65
+## friend_country_cnt       7 40300     3.96     5.76     2.00     2.66
+## subscriber_friend_cnt    8 40300     0.42     2.42     0.00     0.13
+## songsListened            9 40300 17589.44 28416.02  7440.00 11817.64
+## lovedTracks             10 40300    86.82   263.58    14.00    36.35
+## posts                   11 40300     5.29   104.31     0.00     0.23
+## playlists               12 40300     0.55     1.07     0.00     0.45
+## shouts                  13 40300    29.97   150.69     4.00     8.84
+## adopter                 14 40300     0.00     0.00     0.00     0.00
+## tenure                  15 40300    43.81    19.79    44.00    43.72
+## good_country            16 40300     0.36     0.48     0.00     0.32
+##                            mad min     max   range  skew kurtosis     se
+## ï..ID                 14937.19   1   40300   40299  0.00    -1.20  57.95
+## age                       4.45   8      79      71  1.97     6.80   0.03
+## male                      0.00   0       1       1 -0.50    -1.75   0.00
+## friend_cnt                7.41   1    4957    4956 32.67  2087.42   0.29
+## avg_friend_age            3.95   8      77      69  1.84     7.15   0.03
+## avg_friend_male           0.35   0       1       1 -0.52    -0.72   0.00
+## friend_country_cnt        1.48   0     129     129  4.74    38.29   0.03
+## subscriber_friend_cnt     0.00   0     309     309 72.19  8024.62   0.01
+## songsListened         10576.87   0 1000000 1000000  6.05   105.85 141.55
+## lovedTracks              20.76   0   12522   12522 13.12   335.93   1.31
+## posts                     0.00   0   12309   12309 73.92  7005.34   0.52
+## playlists                 0.00   0      98      98 28.21  1945.28   0.01
+## shouts                    4.45   0    7736    7736 22.53   779.12   0.75
+## adopter                   0.00   0       0       0   NaN      NaN   0.00
+## tenure                   22.24   1     111     110  0.05    -0.70   0.10
+## good_country              0.00   0       1       1  0.59    -1.65   0.00
+## -------------------------------------------------------- 
+## group: 1
+##                       vars    n     mean       sd   median  trimmed
+## ï..ID                    1 3527 42064.00  1018.30 42064.00 42064.00
+## age                      2 3527    25.98     6.84    24.00    25.05
+## male                     3 3527     0.73     0.44     1.00     0.79
+## friend_cnt               4 3527    39.73   117.27    16.00    23.69
+## avg_friend_age           5 3527    25.44     5.21    24.36    24.83
+## avg_friend_male          6 3527     0.64     0.25     0.67     0.65
+## friend_country_cnt       7 3527     7.19     8.86     4.00     5.36
+## subscriber_friend_cnt    8 3527     1.64     5.85     0.00     0.84
+## songsListened            9 3527 33758.04 43592.73 20908.00 25811.69
+## lovedTracks             10 3527   264.34   491.43   108.00   161.68
+## posts                   11 3527    21.20   221.99     0.00     1.44
+## playlists               12 3527     0.90     2.56     1.00     0.59
+## shouts                  13 3527    99.44  1156.07     9.00    23.89
+## adopter                 14 3527     1.00     0.00     1.00     1.00
+## tenure                  15 3527    45.58    20.04    46.00    45.60
+## good_country            16 3527     0.29     0.45     0.00     0.23
+##                            mad   min    max  range  skew kurtosis     se
+## ï..ID                  1307.65 40301  43827   3526  0.00    -1.20  17.15
+## age                       4.45     8     73     65  1.68     4.39   0.12
+## male                      0.00     0      1      1 -1.03    -0.94   0.01
+## friend_cnt               17.79     1   5089   5088 26.04  1013.79   1.97
+## avg_friend_age            3.91    12     62     50  1.68     5.05   0.09
+## avg_friend_male           0.25     0      1      1 -0.54    -0.05   0.00
+## friend_country_cnt        4.45     0    136    136  3.61    24.53   0.15
+## subscriber_friend_cnt     0.00     0    287    287 34.05  1609.52   0.10
+## songsListened         23276.82     0 817290 817290  4.71    46.64 734.03
+## lovedTracks             140.85     0  10220  10220  6.52    80.96   8.27
+## posts                     0.00     0   8506   8506 26.52   852.38   3.74
+## playlists                 1.48     0    118    118 28.84  1244.31   0.04
+## shouts                   11.86     0  65872  65872 52.52  2969.09  19.47
+## adopter                   0.00     1      1      0   NaN      NaN   0.00
+## tenure                   20.76     0    111    111  0.02    -0.62   0.34
+## good_country              0.00     0      1      1  0.94    -1.12   0.01</code></pre>
+<pre class="r"><code>#Take log of variables where values are too large compared to the others
+High_Note &lt;- High_Note %&gt;% mutate(ln_songsListened = log(songsListened + 1))
+High_Note &lt;- High_Note %&gt;% mutate(ln_lovedTracks = log(lovedTracks + 1))</code></pre>
+<pre class="r"><code>#Start with some visualizations
+ggcorr(High_Note, palette = &quot;RdBu&quot;, label = TRUE)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig1-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pairs(~age+friend_cnt+ln_songsListened+posts, col=High_Note$adopter, data=High_Note, main=&quot;Scatterplot Matrix&quot;)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig1-2.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Demographics
+Age_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = age)) + geom_boxplot(aes(fill = factor(adopter))) + labs(x = &quot;Adopter&quot;)
+Age_plot</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>Age_plotbygender &lt;- ggplot(High_Note, aes(x=factor(adopter), y=age, color = factor(male))) + geom_boxplot() + labs(x = &quot;Adopter&quot;)
+Age_plotbygender</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Peer influence
+friend_cnt_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = friend_cnt)) + geom_boxplot(aes(fill = factor(adopter))) +ylim(0, 1250) +
+  labs(x = &quot;Adopter&quot;)
+friend_cnt_plot</code></pre>
+<pre><code>## Warning: Removed 13 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig3-1.png" width="672" /></p>
+<pre class="r"><code>subscriber_friend_cnt_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = subscriber_friend_cnt)) + 
+  geom_boxplot(aes(fill = factor(adopter))) + ylim(0, 50)  + labs(x = &quot;Adopter&quot;)
+subscriber_friend_cnt_plot</code></pre>
+<pre><code>## Warning: Removed 9 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig3-2.png" width="672" /></p>
+<pre class="r"><code>#user engagement 
+ln_songsListened_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = ln_songsListened)) + geom_boxplot(aes(fill = factor(adopter)))
+ln_songsListened_plot</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ln_lovedTracks_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = ln_lovedTracks)) + geom_boxplot(aes(fill = factor(adopter)))
+ln_lovedTracks_plot</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig4-2.png" width="672" style="display: block; margin: auto;" />
+##Propensity Score Matching</p>
+<pre class="r"><code>#Transform subscriber friend count into the Treatment and control variable with Treatment being 1 and Control being 0
+High_Note$Treatment &lt;- ifelse(High_Note$subscriber_friend_cnt &gt;= 1, 1, 0)</code></pre>
+<pre class="r"><code>#For those who have 1 or more subscriber friends, on average 18% of them are premuim subsribers, 
+# while those who have 0 subscriber friends, on average 5%  of them are premium subscribers. 
+
+High_Note %&gt;%
+  group_by(Treatment) %&gt;%
+  summarise(mean_adopter = mean(adopter))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   Treatment mean_adopter
+##       &lt;dbl&gt;        &lt;dbl&gt;
+## 1         0       0.0524
+## 2         1       0.178</code></pre>
+<pre class="r"><code>with(High_Note, t.test(adopter ~ Treatment))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  adopter by Treatment
+## t = -30.961, df = 11815, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.1330281 -0.1171869
+## sample estimates:
+## mean in group 0 mean in group 1 
+##      0.05243501      0.17754250</code></pre>
+</div>
+<div id="difference-in-means-pre-treatment-covariates" class="section level1">
+<h1>Difference-in-means: pre-treatment covariates</h1>
+</div>
+<div id="lets-calculate-the-mean-for-each-covariate" class="section level1">
+<h1>Let’s calculate the mean for each covariate</h1>
+<pre class="r"><code>High_Note_cov &lt;- c(&quot;age&quot;,&quot;male&quot;,&quot;friend_cnt&quot;,&quot;avg_friend_age&quot;,&quot;avg_friend_male&quot;,&quot;friend_country_cnt&quot;,&quot;ln_songsListened&quot;, 
+              &quot;ln_lovedTracks&quot;,&quot;posts&quot;,&quot;playlists&quot;,&quot;shouts&quot;, &quot;tenure&quot;,&quot;good_country&quot;)
+High_Note %&gt;%
+  group_by(Treatment) %&gt;%
+  select(one_of(High_Note_cov)) %&gt;%
+  summarise_all(funs(mean(., na.rm = T)))</code></pre>
+<pre><code>## Adding missing grouping variables: `Treatment`</code></pre>
+<pre><code>## Warning: funs() is soft deprecated as of dplyr 0.8.0
+## Please use a list of either functions or lambdas: 
+## 
+##   # Simple named list: 
+##   list(mean = mean, median = median)
+## 
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## This warning is displayed once per session.</code></pre>
+<pre><code>## # A tibble: 2 x 14
+##   Treatment   age  male friend_cnt avg_friend_age avg_friend_male
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+## 1         0  23.7 0.629       10.4           23.8           0.613
+## 2         1  25.4 0.636       54.0           25.4           0.636
+## # ... with 8 more variables: friend_country_cnt &lt;dbl&gt;,
+## #   ln_songsListened &lt;dbl&gt;, ln_lovedTracks &lt;dbl&gt;, posts &lt;dbl&gt;,
+## #   playlists &lt;dbl&gt;, shouts &lt;dbl&gt;, tenure &lt;dbl&gt;, good_country &lt;dbl&gt;</code></pre>
+<pre class="r"><code>#T-test
+list_of_var &lt;- c(&quot;age&quot;,&quot;male&quot;,&quot;friend_cnt&quot;,&quot;avg_friend_age&quot;,&quot;avg_friend_male&quot;,&quot;friend_country_cnt&quot;,&quot;ln_songsListened&quot;, 
+              &quot;ln_lovedTracks&quot;,&quot;posts&quot;,&quot;playlists&quot;,&quot;shouts&quot;, &quot;tenure&quot;,&quot;good_country&quot;)
+lapply(list_of_var, function(v) {
+  t.test(High_Note[, v] ~ High_Note$Treatment)
+})</code></pre>
+<pre><code>## [[1]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -20.841, df = 14645, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.778544 -1.472749
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        23.74756        25.37321 
+## 
+## 
+## [[2]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -1.3459, df = 15986, p-value = 0.1784
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.018236129  0.003388028
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6288378       0.6362618 
+## 
+## 
+## [[3]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -33.707, df = 9903.1, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -46.12459 -41.05469
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        10.43133        54.02097 
+## 
+## 
+## [[4]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -27.658, df = 15667, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.744514 -1.513611
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        23.76137        25.39043 
+## 
+## 
+## [[5]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -7.7114, df = 23020, p-value = 1.294e-14
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.02846397 -0.01692672
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6131124       0.6358077 
+## 
+## 
+## [[6]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -65.05, df = 10372, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -6.861271 -6.459857
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        2.725062        9.385626 
+## 
+## 
+## [[7]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -72.169, df = 24545, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.702958 -1.612902
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        7.944104        9.602034 
+## 
+## 
+## [[8]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -64.938, df = 15507, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.557214 -1.465962
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        2.446598        3.958186 
+## 
+## 
+## [[9]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -7.3649, df = 9933.6, p-value = 1.914e-13
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -22.76492 -13.19424
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        2.543377       20.522956 
+## 
+## 
+## [[10]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -10.492, df = 11238, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.2546958 -0.1745100
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.5294671       0.7440700 
+## 
+## 
+## [[11]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -11.426, df = 9888.1, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -100.04703  -70.74591
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        16.42304       101.81951 
+## 
+## 
+## [[12]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -14.696, df = 15805, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -3.792309 -2.899752
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        43.20268        46.54871 
+## 
+## 
+## [[13]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = 2.0956, df = 16030, p-value = 0.03613
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.0007383591 0.0220968020
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.3546936       0.3432760</code></pre>
+<p>Propensity score estimation
+We estimate the propensity score by running a logit model (probit also works)
+where the outcome variable is a binary variable indicating treatment status.
+what covariates should we include? For the matching to give you a causal estimate
+in the end, you need to include any covariate that is related to both the treatment
+assignment and potential outcomes. Therefore at this moment I choose to include all variables</p>
+<pre class="r"><code>m_ps &lt;- glm(Treatment ~ age + male + friend_cnt + avg_friend_age + avg_friend_male + friend_country_cnt +  
+               ln_songsListened + ln_lovedTracks + posts + playlists + shouts + tenure + good_country,
+             family = binomial(), data = High_Note)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summary(m_ps)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Treatment ~ age + male + friend_cnt + avg_friend_age + 
+##     avg_friend_male + friend_country_cnt + ln_songsListened + 
+##     ln_lovedTracks + posts + playlists + shouts + tenure + good_country, 
+##     family = binomial(), data = High_Note)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -4.1675  -0.5870  -0.4007  -0.1806   6.8050  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -6.7989512  0.1066723 -63.737  &lt; 2e-16 ***
+## age                 0.0211928  0.0028963   7.317 2.53e-13 ***
+## male                0.0127828  0.0303040   0.422  0.67316    
+## friend_cnt          0.0281816  0.0010230  27.549  &lt; 2e-16 ***
+## avg_friend_age      0.0836847  0.0036034  23.224  &lt; 2e-16 ***
+## avg_friend_male     0.2322512  0.0524685   4.426 9.58e-06 ***
+## friend_country_cnt  0.1021891  0.0046711  21.877  &lt; 2e-16 ***
+## ln_songsListened    0.1700614  0.0088009  19.323  &lt; 2e-16 ***
+## ln_lovedTracks      0.1282609  0.0076995  16.658  &lt; 2e-16 ***
+## posts               0.0006760  0.0002331   2.900  0.00373 ** 
+## playlists          -0.0108768  0.0131725  -0.826  0.40897    
+## shouts             -0.0004121  0.0001525  -2.703  0.00688 ** 
+## tenure             -0.0031864  0.0007966  -4.000 6.33e-05 ***
+## good_country        0.0032863  0.0293230   0.112  0.91077    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 46640  on 43826  degrees of freedom
+## Residual deviance: 33588  on 43813  degrees of freedom
+## AIC: 33616
+## 
+## Number of Fisher Scoring iterations: 25</code></pre>
+<p>Using this model, we can now calculate the propensity score for each user
+It is simply the user’s predicted probability of being Treated,
+given the estimates from the logit model.</p>
+<pre class="r"><code>prs_df &lt;- data.frame(pr_score = predict(m_ps, type = &quot;response&quot;),
+                     Treatment = m_ps$model$Treatment)
+head(prs_df)</code></pre>
+<pre><code>##     pr_score Treatment
+## 1 0.12150210         0
+## 2 0.03447076         0
+## 3 0.04815195         0
+## 4 0.22831497         1
+## 5 0.65092056         0
+## 6 0.18205340         0</code></pre>
+<p>Examining the region of common support
+After estimating the propensity score, it is useful to plot histograms of the estimated propensity scores by treatment status</p>
+<pre class="r"><code>labs &lt;- paste(&quot;Treatment type:&quot;, c(&quot;1 or more friends&quot;, &quot;0 friends&quot;))
+prs_df %&gt;%
+  mutate(SubscriberType = ifelse(Treatment == 1, labs[1], labs[2])) %&gt;%
+  ggplot(aes(x = pr_score)) +
+  geom_histogram(color = &quot;white&quot;, binwidth = 0.025) +
+  facet_wrap(~SubscriberType) +
+  xlab(&quot;Probability of Treatment&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>The method we use below is to find pairs of observations that have very similar propensity scores,
+but that differ in their treatment status. We use the package MatchIt for this.
+This package estimates the propensity score in the background and then matches observations based
+on the method of choice (“nearest” in this case)</p>
+<pre class="r"><code>High_Note_nomiss &lt;- High_Note %&gt;%  # MatchIt does not allow missing values
+  select(adopter, Treatment, one_of(High_Note_cov)) %&gt;%
+  na.omit()
+
+mod_match &lt;- matchit(Treatment ~ age + male + friend_cnt + avg_friend_age + avg_friend_male + friend_country_cnt +  
+                       ln_songsListened + ln_lovedTracks + posts + playlists + shouts + tenure + good_country,
+                     method = &quot;nearest&quot;, data = High_Note_nomiss)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<p>We can get some information about how successful the matching was using summary(mod_match) and plot(mod_match)</p>
+<pre class="r"><code>summary(mod_match)</code></pre>
+<pre><code>## 
+## Call:
+## matchit(formula = Treatment ~ age + male + friend_cnt + avg_friend_age + 
+##     avg_friend_male + friend_country_cnt + ln_songsListened + 
+##     ln_lovedTracks + posts + playlists + shouts + tenure + good_country, 
+##     data = High_Note_nomiss, method = &quot;nearest&quot;)
+## 
+## Summary of balance for all data:
+##                    Means Treated Means Control SD Control Mean Diff
+## distance                  0.4689        0.1532     0.1496    0.3157
+## age                      25.3732       23.7476     6.2245    1.6256
+## male                      0.6363        0.6288     0.4831    0.0074
+## friend_cnt               54.0210       10.4313    15.2769   43.5896
+## avg_friend_age           25.3904       23.7614     5.0577    1.6291
+## avg_friend_male           0.6358        0.6131     0.3343    0.0227
+## friend_country_cnt        9.3856        2.7251     3.1024    6.6606
+## ln_songsListened          9.6020        7.9441     2.7002    1.6579
+## ln_lovedTracks            3.9582        2.4466     1.9781    1.5116
+## posts                    20.5230        2.5434    33.7947   17.9796
+## playlists                 0.7441        0.5295     0.9673    0.2146
+## shouts                  101.8195       16.4230    79.7381   85.3965
+## tenure                   46.5487       43.2027    19.7212    3.3460
+## good_country              0.3433        0.3547     0.4784   -0.0114
+##                    eQQ Med eQQ Mean    eQQ Max
+## distance            0.2772   0.3157     0.6429
+## age                 1.0000   1.6296     5.0000
+## male                0.0000   0.0074     1.0000
+## friend_cnt         22.0000  43.5838  4794.0000
+## avg_friend_age      1.5909   1.6369    11.5000
+## avg_friend_male     0.0738   0.0958     0.3636
+## friend_country_cnt  5.0000   6.6598    95.0000
+## ln_songsListened    1.2880   1.6583     6.0283
+## ln_lovedTracks      1.5315   1.5115     2.8332
+## posts               0.0000  17.8829  9535.0000
+## playlists           0.0000   0.2092    26.0000
+## shouts             15.0000  85.1764 59168.0000
+## tenure              3.0000   3.3473    10.0000
+## good_country        0.0000   0.0114     1.0000
+## 
+## 
+## Summary of balance for matched data:
+##                    Means Treated Means Control SD Control Mean Diff
+## distance                  0.4689        0.3151     0.1854    0.1538
+## age                      25.3732       25.7794     7.5478   -0.4062
+## male                      0.6363        0.6585     0.4743   -0.0222
+## friend_cnt               54.0210       21.5264    23.3770   32.4946
+## avg_friend_age           25.3904       26.0051     6.4510   -0.6146
+## avg_friend_male           0.6358        0.6478     0.2587   -0.0120
+## friend_country_cnt        9.3856        5.0678     4.6172    4.3178
+## ln_songsListened          9.6020        9.4839     1.6281    0.1181
+## ln_lovedTracks            3.9582        3.7265     1.8645    0.2317
+## posts                    20.5230        6.2683    60.7389   14.2546
+## playlists                 0.7441        0.6678     0.9905    0.0762
+## shouts                  101.8195       36.7657   134.5236   65.0539
+## tenure                   46.5487       47.1905    19.1378   -0.6418
+## good_country              0.3433        0.3602     0.4801   -0.0169
+##                    eQQ Med eQQ Mean    eQQ Max
+## distance            0.1147   0.1538     0.4184
+## age                 0.0000   0.4599     6.0000
+## male                0.0000   0.0222     1.0000
+## friend_cnt         12.0000  32.4946  4794.0000
+## avg_friend_age      0.3333   0.8619    14.0000
+## avg_friend_male     0.0119   0.0258     0.1463
+## friend_country_cnt  2.0000   4.3178    95.0000
+## ln_songsListened    0.1447   0.1653     2.1972
+## ln_lovedTracks      0.3081   0.2664     0.8255
+## posts               0.0000  14.2546  9535.0000
+## playlists           0.0000   0.1194    95.0000
+## shouts              9.0000  65.0539 59168.0000
+## tenure              1.0000   0.9592     3.0000
+## good_country        0.0000   0.0169     1.0000
+## 
+## Percent Balance Improvement:
+##                    Mean Diff.  eQQ Med  eQQ Mean   eQQ Max
+## distance              51.2952  58.6333   51.2929   34.9201
+## age                   75.0137 100.0000   71.7766  -20.0000
+## male                -198.9313   0.0000 -198.6301    0.0000
+## friend_cnt            25.4535  45.4545   25.4436    0.0000
+## avg_friend_age        62.2701  79.0476   47.3451  -21.7391
+## avg_friend_male       47.2679  83.8776   73.0291   59.7722
+## friend_country_cnt    35.1733  60.0000   35.1656    0.0000
+## ln_songsListened      92.8737  88.7676   90.0310   63.5514
+## ln_lovedTracks        84.6695  79.8827   82.3770   70.8626
+## posts                 20.7178   0.0000   20.2893    0.0000
+## playlists             64.4694   0.0000   42.9197 -265.3846
+## shouts                23.8214  40.0000   23.6246    0.0000
+## tenure                80.8203  66.6667   71.3452   70.0000
+## good_country         -48.0096   0.0000  -48.2143    0.0000
+## 
+## Sample sizes:
+##           Control Treated
+## All         34004    9823
+## Matched      9823    9823
+## Unmatched   24181       0
+## Discarded       0       0</code></pre>
+<pre class="r"><code>plot(mod_match)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-1.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-2.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-3.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-4.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-5.png" width="672" /></p>
+<p>To create a dataframe containing only the matched observations, use the match.data() function</p>
+<pre class="r"><code>dta_m &lt;- match.data(mod_match)
+dim(dta_m)</code></pre>
+<pre><code>## [1] 19646    17</code></pre>
+<p>Examining covariate balance in the matched sample
+Visual Inspection</p>
+<pre class="r"><code>fn_bal &lt;- function(dta, variable) {
+  dta$variable &lt;- dta[, variable]
+  dta$Treatment &lt;- as.factor(dta$Treatment)
+  support &lt;- c(min(dta$variable), max(dta$variable))
+  ggplot(dta, aes(x = distance, y = variable, color = Treatment)) +
+    geom_point(alpha = 0.2, size = 1.3) +
+    geom_smooth(method = &quot;loess&quot;, se = F) +
+    xlab(&quot;Propensity score&quot;) +
+    ylab(variable) +
+    theme_bw() +
+    ylim(support)
+}
+
+grid.arrange(
+  fn_bal(dta_m, &quot;age&quot;),
+  fn_bal(dta_m, &quot;male&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;friend_cnt&quot;),
+  fn_bal(dta_m, &quot;avg_friend_age&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;friend_country_cnt&quot;),
+  fn_bal(dta_m, &quot;ln_songsListened&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;ln_lovedTracks&quot;),
+  fn_bal(dta_m, &quot;playlists&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;tenure&quot;),
+  fn_bal(dta_m, &quot;good_country&quot;) + theme(legend.position = &quot;none&quot;),
+  nrow = 6, widths = c(1, 0.8)
+)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+Difference of Means</p>
+<pre class="r"><code>dta_m %&gt;%
+  group_by(Treatment) %&gt;%
+  select(one_of(High_Note_cov)) %&gt;%
+  summarise_all(funs(mean))</code></pre>
+<pre><code>## Adding missing grouping variables: `Treatment`</code></pre>
+<pre><code>## # A tibble: 2 x 14
+##   Treatment   age  male friend_cnt avg_friend_age avg_friend_male
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+## 1         0  25.8 0.658       21.5           26.0           0.648
+## 2         1  25.4 0.636       54.0           25.4           0.636
+## # ... with 8 more variables: friend_country_cnt &lt;dbl&gt;,
+## #   ln_songsListened &lt;dbl&gt;, ln_lovedTracks &lt;dbl&gt;, posts &lt;dbl&gt;,
+## #   playlists &lt;dbl&gt;, shouts &lt;dbl&gt;, tenure &lt;dbl&gt;, good_country &lt;dbl&gt;</code></pre>
+<pre class="r"><code>lapply(High_Note_cov, function(v) {
+  t.test(dta_m[, v] ~ dta_m$Treatment)
+})</code></pre>
+<pre><code>## [[1]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 3.9186, df = 19521, p-value = 8.937e-05
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.2030131 0.6093660
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        25.77940        25.37321 
+## 
+## 
+## [[2]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 3.2559, df = 19640, p-value = 0.001132
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.008832644 0.035552982
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6584546       0.6362618 
+## 
+## 
+## [[3]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -24.769, df = 10477, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -35.06619 -29.92292
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        21.52642        54.02097 
+## 
+## 
+## [[4]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 7.3709, df = 18749, p-value = 1.765e-13
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.4511959 0.7780907
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        26.00507        25.39043 
+## 
+## 
+## [[5]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 3.428, df = 19374, p-value = 0.0006094
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.005124659 0.018810817
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6477754       0.6358077 
+## 
+## 
+## [[6]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -38.82, df = 13820, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -4.535843 -4.099808
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        5.067800        9.385626 
+## 
+## 
+## [[7]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -4.8926, df = 19535, p-value = 1.003e-06
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.1654825 -0.0708156
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        9.483885        9.602034 
+## 
+## 
+## [[8]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -8.294, df = 19474, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.2864991 -0.1769691
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        3.726452        3.958186 
+## 
+## 
+## [[9]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -5.6784, df = 11062, p-value = 1.394e-08
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -19.175269  -9.333944
+## sample estimates:
+## mean in group 0 mean in group 1 
+##         6.26835        20.52296 
+## 
+## 
+## [[10]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -3.4421, df = 14535, p-value = 0.0005789
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.11967088 -0.03282836
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6678204       0.7440700 
+## 
+## 
+## [[11]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -8.5779, df = 10471, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -79.91979 -50.18792
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        36.76565       101.81951 
+## 
+## 
+## [[12]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 2.3025, df = 19612, p-value = 0.02132
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.09544044 1.18807784
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        47.19047        46.54871 
+## 
+## 
+## [[13]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 2.4805, df = 19642, p-value = 0.01313
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.003545363 0.030252866
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.3601751       0.3432760</code></pre>
+<p>Estimating treatment effects</p>
+<p>Estimating the treatment effect is simple once we have
+a matched sample that we are happy with. We can use a t-test:</p>
+<pre class="r"><code>with(dta_m, t.test(adopter ~ Treatment))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  adopter by Treatment
+## t = -16.725, df = 18453, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.09098592 -0.07189711
+## sample estimates:
+## mean in group 0 mean in group 1 
+##      0.09610099      0.17754250</code></pre>
+<p>Or we can use OLS with or without covariates:</p>
+<pre class="r"><code>glm_treat1 &lt;- glm(adopter ~ Treatment, data = dta_m, family = &quot;binomial&quot;)
+summary(glm_treat1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = adopter ~ Treatment, family = &quot;binomial&quot;, data = dta_m)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6252  -0.6252  -0.4495  -0.4495   2.1644  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.24132    0.03423  -65.48   &lt;2e-16 ***
+## Treatment    0.70823    0.04323   16.38   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 15683  on 19645  degrees of freedom
+## Residual deviance: 15404  on 19644  degrees of freedom
+## AIC: 15408
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>glm_treat2 &lt;- glm(adopter ~ age + male + friend_cnt + avg_friend_age + avg_friend_male + friend_country_cnt +  
+                    ln_songsListened + ln_lovedTracks + posts + playlists + shouts + tenure + good_country + Treatment, 
+                  data = dta_m, family = &quot;binomial&quot;)
+summary(glm_treat2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = adopter ~ age + male + friend_cnt + avg_friend_age + 
+##     avg_friend_male + friend_country_cnt + ln_songsListened + 
+##     ln_lovedTracks + posts + playlists + shouts + tenure + good_country + 
+##     Treatment, family = &quot;binomial&quot;, data = dta_m)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8606  -0.5791  -0.4414  -0.3078   3.0933  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -6.432e+00  2.287e-01 -28.118  &lt; 2e-16 ***
+## age                 1.562e-02  4.257e-03   3.670 0.000243 ***
+## male                2.999e-01  4.886e-02   6.138 8.38e-10 ***
+## friend_cnt          2.092e-04  2.780e-04   0.752 0.451845    
+## avg_friend_age      2.881e-02  5.681e-03   5.071 3.96e-07 ***
+## avg_friend_male     9.103e-02  9.660e-02   0.942 0.346005    
+## friend_country_cnt -4.700e-03  3.701e-03  -1.270 0.204087    
+## ln_songsListened    2.035e-01  1.928e-02  10.554  &lt; 2e-16 ***
+## ln_lovedTracks      2.672e-01  1.342e-02  19.916  &lt; 2e-16 ***
+## posts               1.653e-04  9.384e-05   1.762 0.078131 .  
+## playlists           3.776e-02  1.315e-02   2.872 0.004084 ** 
+## shouts              9.645e-05  7.059e-05   1.366 0.171798    
+## tenure             -3.914e-03  1.262e-03  -3.101 0.001928 ** 
+## good_country       -3.986e-01  4.780e-02  -8.339  &lt; 2e-16 ***
+## Treatment           6.379e-01  4.628e-02  13.783  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 15683  on 19645  degrees of freedom
+## Residual deviance: 14366  on 19631  degrees of freedom
+## AIC: 14396
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<p>In a logistic regression the response being modeled is the log(odds) that Y = 1
+The regression coefficient gives the change in log(odds) in the response for a unit change in the predictor variable
+because log(odds) are difficult to interpret, we can exponentiate them</p>
+<p>We can see that the odds of being a premium subscriber are increased by a factor of 1.499 when and individual is male</p>
+<pre class="r"><code>exp(coef(glm_treat2))</code></pre>
+<pre><code>##        (Intercept)                age               male 
+##        0.001609923        1.015744376        1.349707685 
+##         friend_cnt     avg_friend_age    avg_friend_male 
+##        1.000209180        1.029229423        1.095303373 
+## friend_country_cnt   ln_songsListened     ln_lovedTracks 
+##        0.995310871        1.225697366        1.306303144 
+##              posts          playlists             shouts 
+##        1.000165322        1.038485243        1.000096459 
+##             tenure       good_country          Treatment 
+##        0.996093907        0.671239518        1.892417465</code></pre>
+</div>
+
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/r-markdown">R Markdown</a></span><span class="tag"><a href="/tags/plot">plot</a></span><span class="tag"><a href="/tags/propensity-score-matching">Propensity Score matching&#34;</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>4687 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-04-16 19:13 -0700</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="/posts/kidney_stones_simpsons_paradox/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Kidney Stones and Simpson&#39;s Paradox</span>
+			</a>
+			<a class="prev-post" href="/posts/2019-03-13-amazon-network-analysis/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Amazon Network Analysis</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 <a href="/">Pablo Barajas</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+
+	<script src="/js/bundle.min.490e43e5af6db5906f28afa49a4e16bf9f626b758e3fca92f146b870eb94bb37.js" integrity="sha256-SQ5D5a9ttZBvKK+kmk4Wv59ia3WOP8qS8Ua4cOuUuzc=" crossorigin="anonymous"></script>
+	
+
+</body>
+
+</html>

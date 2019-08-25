@@ -1,0 +1,102 @@
+---
+title: "Amazon Network Analysis"
+author: "Pablo"
+date: 2019-03-13T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "graph"]
+output:
+    prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Amazon Network Analysis
+
+```{r warning = FALSE, error = FALSE, message = FALSE}
+# Load relevant packages
+library(car)
+library(dplyr)
+library(tidyr)
+library(igraph)
+library(ggplot2)
+library(corrplot)
+```
+
+```{r echo=FALSE}
+#Read in the dataset
+copurchase <- read.csv("C:/Users/Pablo/Desktop/R_Projects/Amazon Network Analysis/Data/copurchase.csv", stringsAsFactors = FALSE)
+products <- read.csv("C:/Users/Pablo/Desktop/R_Projects/Amazon Network Analysis/Data/products.csv", stringsAsFactors = FALSE)
+```
+
+```{r}
+head(products)
+head(copurchase)
+```
+```{r}
+#We are onluy interested in a subset of this dataset, we want to look for Books 
+books.products <- filter(products, group == "Book" 
+                         & salesrank <= 150000 & salesrank >= 0)
+
+books.copurchase <- filter(copurchase, Source %in% books.products$id
+                           & Target %in% books.products$id)
+```
+
+```{r}
+#We want to find the ID with the highest indegree (For a vertex, the number of head ends adjacent to a vertex is called the indegree of the vertex)
+indegree.df <- summarize(group_by(books.copurchase, Target), indegree = n()) %>% arrange(desc(indegree))
+names(indegree.df)[1]<-"id"
+head(indegree.df)
+```
+
+```{r}
+##We want to find the ID with the highest outdegree (the number of tail ends adjacent to a vertex is its outdegree)
+outdegree.df <- summarize(group_by(books.copurchase, Source), outdegree = n()) %>% arrange(desc(outdegree))
+names(outdegree.df)[1]<-"id"
+head(outdegree.df)
+```
+
+```{r}
+books.graph <- merge(books.products, indegree.df, by="id", all.x = TRUE)  #Merge the Dataframes
+books.graph <- merge(books.graph, outdegree.df, by="id", all.x = TRUE)  #Merge the Dataframes
+books.graph$indegree[is.na(books.graph$indegree)] <- 0     #ssign 0 to those who are na
+books.graph$outdegree[is.na(books.graph$outdegree)] <- 0  #assign 0 to those who are na
+books.graph <- mutate(books.graph, degree = indegree + outdegree) # sum indegree and outdegree to create degree
+head(books.graph)
+```
+
+```{r}
+#We are looking for the book with highest degree
+filter(books.graph, degree == max(books.graph$degree))
+```
+
+```{r}
+g <- graph_from_data_frame(books.copurchase, directed = TRUE)    #we creathe a directed graph
+sg <- induced_subgraph(g, subcomponent(g, "4429", "all"), impl = "auto")  #we are only interested in id "4429"
+sg <- simplify(sg, remove.multiple = F, remove.loops = T)
+V(sg)
+E(sg)
+```
+
+```{r}
+diameter <- get_diameter(sg)
+diameter
+```
+
+```{r fig1, fig.height = 15, fig.width = 15, fig.align = "center"}
+#Plot the graph for id "4429"
+
+V(sg)$color <- ifelse(V(sg)$name %in% diameter$name, "red", "lightblue")
+V(sg)["4429"]$color <- "green"
+V(sg)["33"]$color <- "gold"
+E(sg)$color <- "darkgray"
+E(sg,path=diameter)$color <- "red"
+E(sg)$width <- 1
+E(sg,path=diameter)$width <- 3
+options(repr.plot.width = 100, repr.plot.height = 100)
+plot(sg, layout=layout_with_fr, vertex.size=1, vertex.label=NA, edge.arrow.size=0.05)
+```
+

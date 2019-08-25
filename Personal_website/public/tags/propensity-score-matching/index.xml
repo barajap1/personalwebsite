@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Propensity Score matching&#34; on Pablo Barajas</title>
+    <link>/tags/propensity-score-matching/</link>
+    <description>Recent content in Propensity Score matching&#34; on Pablo Barajas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Tue, 16 Apr 2019 21:13:14 -0500</lastBuildDate>
+    
+	<atom:link href="/tags/propensity-score-matching/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Peer Influence for a music-streaming company</title>
+      <link>/posts/peer_influence/</link>
+      <pubDate>Tue, 16 Apr 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/peer_influence/</guid>
+      <description>Peer Influence for a music-streaming company# Load relevant packageslibrary(dplyr)library(ggplot2)library(corrplot)library(MatchIt)library(psych)library(GGally)library(gridExtra)#read the datasetHigh_Note &amp;lt;- read.csv(&amp;quot;Data/peer_influence.csv&amp;quot;, header = TRUE)describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)## ## Descriptive statistics by group ## group: 0## vars n mean sd median trimmed## ï..ID 1 40300 20150.50 11633.75 20150.50 20150.50## age 2 40300 23.95 6.37 23.00 23.09## male 3 40300 0.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blogs on Pablo Barajas</title>
+    <link>/blog/</link>
+    <description>Recent content in Blogs on Pablo Barajas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Mon, 22 Apr 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Tableau</title>
+      <link>/blog/2019-04-22-tableau/</link>
+      <pubDate>Mon, 22 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/2019-04-22-tableau/</guid>
+      <description>You can find a public dashboard I created here Tableau Public Profile</description>
+    </item>
+    
+    <item>
+      <title>Quotes</title>
+      <link>/blog/2019-04-19-quotes/</link>
+      <pubDate>Fri, 19 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/2019-04-19-quotes/</guid>
+      <description>I will be updating this page with my favorite quotes &amp;ldquo;When the facts change, I change my opinion. What do you do, sir?&amp;rdquo;&amp;rdquo; ― John Maynard Keynes
+“It’s not what you preach, it’s what you tolerate.” ― Jocko Willink
+“Don’t expect to be motivated every day to get out there and make things happen. You won’t be. Don’t count on motivation. Count on Discipline.” ― Jocko Willink
+“When setting expectations, no matter what has been said or written, if substandard performance is accepted and no one is held accountable—if there are no consequences—that poor performance becomes the new standard.</description>
+    </item>
+    
+    <item>
+      <title>Markdown</title>
+      <link>/blog/2019-04-19-markdown/</link>
+      <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/2019-04-19-markdown/</guid>
+      <description>H1 Heading H2 Heading H3 Heading Here&amp;rsquo;s some basic text.
+And here&amp;rsquo;s some italics
+Here&amp;rsquo;s some bold text.
+What about a link?
+Here&amp;rsquo;s a bulleted list: * First item + Second item - Third item
+Here&amp;rsquo;s a numbered list: 1. First 2. Second 3. Third
+A table:
+   Tables Are Cool     col 1 is left-aligned $1600   col 2 is centered $12   col 3 is right-aligned $1    Python code block:</description>
+    </item>
+    
+  </channel>
+</rss>

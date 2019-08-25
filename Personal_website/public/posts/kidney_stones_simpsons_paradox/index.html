@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#494f5c">
+	<meta name="msapplication-TileColor" content="#494f5c">
+
+<meta itemprop="name" content="Kidney Stones and Simpson&#39;s Paradox">
+<meta itemprop="description" content="1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.">
+
+
+<meta itemprop="datePublished" content="2019-06-29T21:13:14-05:00" />
+<meta itemprop="dateModified" content="2019-06-29T21:13:14-05:00" />
+<meta itemprop="wordCount" content="1170">
+
+
+
+<meta itemprop="keywords" content="R Markdown,plot,graph,logistic regression," />
+<meta property="og:title" content="Kidney Stones and Simpson&#39;s Paradox" />
+<meta property="og:description" content="1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/kidney_stones_simpsons_paradox/" />
+<meta property="article:published_time" content="2019-06-29T21:13:14-05:00"/>
+<meta property="article:modified_time" content="2019-06-29T21:13:14-05:00"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Kidney Stones and Simpson&#39;s Paradox"/>
+<meta name="twitter:description" content="1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Kidney Stones and Simpson&#39;s Paradox</title>
+	<link rel="stylesheet" href="/css/style.min.5ee5e7976cd09872c64e40a582206543f6aa38c69a8c43898aadc70040344b92.css" integrity="sha256-XuXnl2zQmHLGTkClgiBlQ/aqOMaajEOJiq3HAEA0S5I=" crossorigin="anonymous">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">Pablo Barajas</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					
+				<a href="/posts/">Posts</a>
+				<a href="/about-hugo/">About</a>
+				<a href="/blog/">Blog</a>
+
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://www.linkedin.com/in/pabloibarajas/" target="_blank" rel="noopener me" title="Linkedin"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a><a href="mailto:bar09028@gmail.com" target="_blank" rel="noopener me" title="Email"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a><a href="https://github.com/barajap1" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+			<li><a href="/about-hugo/">About</a></li>
+			<li><a href="/blog/">Blog</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Jun 29, 2019</span></div>
+				<h1>Kidney Stones and Simpson&#39;s Paradox</h1>
+			</header>
+			<div class="content">
+				
+
+
+<div id="a-new-look-at-an-old-research-study" class="section level2">
+<h2>1. A new look at an old research study</h2>
+<p>In 1986, a group of urologists in London published a research paper in <strong>The British Medical Journal</strong> that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate. What is going on here? This known statistical phenomenon is called Simpon’s paradox. Simpon’s paradox occurs when trends appear in subgroups but disappear or reverse when subgroups are combined.THis tutorial will explore Simpon’s paradox using multiple regression and other statistical tools.</p>
+<pre class="r"><code># packages
+library(data.table) #for Data Manipulation and for fast reading and writing data
+library(dplyr) #for Data Manipulation
+library(pander) #for nicer output
+library(ggplot2) #for visualizations
+library(broom) #to tidy up
+
+# Reading datasets kidney_stone_data.csv into data
+data &lt;- fread(&quot;Data/kidney_stone_data.csv&quot;)
+
+# Taking a look at the first few rows of the dataset
+pander(head(data))</code></pre>
+<table style="width:49%;">
+<colgroup>
+<col width="16%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">treatment</th>
+<th align="center">stone_size</th>
+<th align="center">success</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="recreate-the-treatment-x-success-summary-table" class="section level2">
+<h2>2. Recreate the Treatment X Success summary table</h2>
+<p>The data contains three columns: <code>treatment</code> (A or B), <code>stone_size</code> (large or small) and <code>success</code> (0 = Failure or 1 = Success). To start, we want to know which treatment had a higher success rate regardless of stone size. Let’s create a table with the number of successes and frequency of success by each treatment using the tidyverse syntax.</p>
+<pre class="r"><code># Calculating the number and frequency of success and failure of each treatment 
+data %&gt;% 
+  group_by(treatment, success) %&gt;%
+  summarise(N = n()) %&gt;% 
+  mutate(Freq = round(N/sum(N), 3))</code></pre>
+<pre><code>## # A tibble: 4 x 4
+## # Groups:   treatment [2]
+##   treatment success     N  Freq
+##   &lt;chr&gt;       &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 A               0    77 0.22 
+## 2 A               1   273 0.78 
+## 3 B               0    61 0.174
+## 4 B               1   289 0.826</code></pre>
+</div>
+<div id="bringing-stone-size-into-the-picture" class="section level2">
+<h2>3. Bringing stone size into the picture</h2>
+<p>From the treatment and success rate descriptive table, we saw that treatment B performed better on average compared to treatment A (82% vs. 78% success rate). Now, let’s consider stone size and see what happens. We are going to stratify the data into small vs. large stone subcategories and compute the same success count and rate by treatment like we did in the previous task.</p>
+<p>The final table will be treatment X stone size X success.</p>
+<pre class="r"><code># Calculating number and frequency of success and failure by stone size for each treatment
+sum_data &lt;- 
+  data %&gt;% 
+  group_by(treatment, stone_size, success) %&gt;%
+  summarise(N = n()) %&gt;%
+  mutate(Freq = round(N/sum(N),3))
+
+# Printing out the data frame we just created
+pander(sum_data)</code></pre>
+<table style="width:68%;">
+<colgroup>
+<col width="16%" />
+<col width="18%" />
+<col width="13%" />
+<col width="8%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">treatment</th>
+<th align="center">stone_size</th>
+<th align="center">success</th>
+<th align="center">N</th>
+<th align="center">Freq</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">0</td>
+<td align="center">71</td>
+<td align="center">0.27</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+<td align="center">192</td>
+<td align="center">0.73</td>
+</tr>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">small</td>
+<td align="center">0</td>
+<td align="center">6</td>
+<td align="center">0.069</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">small</td>
+<td align="center">1</td>
+<td align="center">81</td>
+<td align="center">0.931</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">0</td>
+<td align="center">25</td>
+<td align="center">0.312</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">1</td>
+<td align="center">55</td>
+<td align="center">0.688</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">small</td>
+<td align="center">0</td>
+<td align="center">36</td>
+<td align="center">0.133</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">small</td>
+<td align="center">1</td>
+<td align="center">234</td>
+<td align="center">0.867</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="when-in-doubt-rely-on-a-plot" class="section level2">
+<h2>4. When in doubt, rely on a plot</h2>
+<p>What is going on here? When stratified by stone size, treatment A had better results for both large and small stones compared to treatment B (i.e., 73% and 93% v.s. 69% and 87%). Sometimes a plot is a more efficient way to communicate hidden numerical information in the data. In this task, we are going to apply a plotting technique to reveal the hidden information.</p>
+<pre class="r"><code># Creating a bar plot to show stone size count within each treatment
+sum_data %&gt;%
+  ggplot(aes(x = treatment, y = N)) + 
+  geom_bar(aes(fill = stone_size), stat=&quot;identity&quot;) </code></pre>
+<p><img src="/posts/Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="identify-and-confirm-the-lurking-variable" class="section level2">
+<h2>5. Identify and confirm the lurking variable</h2>
+<p>From the bar plot, we noticed an unbalanced distribution of kidney stone sizes in the two treatment options. Large kidney stone cases tended to be in treatment A, while small kidney stone cases tended to be in treatment B. Can we confirm this hypothesis with statistical testing?</p>
+<p>Analizing the association between stone size (i.e., case severity) and treatment assignment using a statistical test called <strong>Chi-squared</strong>. The <strong>Chi-squared</strong> test is appropriate to test associations between two categorical variables. This test result, together with the common knowledge that a more severe case would be more likely to fail regardless of treatment, will shed light on the root cause of the paradox.</p>
+<pre class="r"><code># Run a Chi-squared test
+trt_ss &lt;- chisq.test(data$treatment, data$stone_size)
+
+# Print out the result in tidy format 
+tidy(trt_ss)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   statistic  p.value parameter method                                      
+##       &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt; &lt;chr&gt;                                       
+## 1      189. 4.40e-43         1 Pearson&#39;s Chi-squared test with Yates&#39; cont~</code></pre>
+</div>
+<div id="remove-the-confounding-effect" class="section level2">
+<h2>6. Remove the confounding effect</h2>
+<p>Now,we are confident that stone size/case severity is indeed the lurking variable (aka, confounding variable) in this study of kidney stone treatment and success rate. The good news is that there are ways to get rid of the effect of the lurking variable.</p>
+<p>Let’s practice using multiple logistic regression to remove the unwanted effect of stone size, and then tidy the output with a function from the <code>broom</code> package</p>
+<pre class="r"><code># Running a multiple logistic regression
+m &lt;- glm(data = data, success ~  stone_size + treatment, family = &quot;binomial&quot;)
+
+# Print out model coefficient table in tidy format
+pander(tidy(m))</code></pre>
+<table style="width:90%;">
+<colgroup>
+<col width="25%" />
+<col width="15%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">term</th>
+<th align="center">estimate</th>
+<th align="center">std.error</th>
+<th align="center">statistic</th>
+<th align="center">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">(Intercept)</td>
+<td align="center">1.033</td>
+<td align="center">0.1345</td>
+<td align="center">7.684</td>
+<td align="center">1.546e-14</td>
+</tr>
+<tr class="even">
+<td align="center">stone_sizesmall</td>
+<td align="center">1.261</td>
+<td align="center">0.239</td>
+<td align="center">5.274</td>
+<td align="center">1.333e-07</td>
+</tr>
+<tr class="odd">
+<td align="center">treatmentB</td>
+<td align="center">-0.3572</td>
+<td align="center">0.2291</td>
+<td align="center">-1.559</td>
+<td align="center">0.1189</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="visualize-model-output" class="section level2">
+<h2>7. Visualize model output</h2>
+<p>We successfully fit a multiple logistic regression and pulled out the model coefficient estimates! Typically (and arbitrarily), P-values below 0.05 indicate statistical significance. Another way to examine whether a significant relationship exists or not is to look at the 95% confidence interval (CI) of the estimate. In our example, we are testing to see:</p>
+<ul>
+<li>if the effect of a small stone is the same as a big stone</li>
+<li>if treatment A is as effective as treatment B.</li>
+</ul>
+<p>If the 95% CI for the coefficient estimates cover zero, we cannot conclude that one is different from the other. Otherwise, there is a significant effect.</p>
+<pre class="r"><code># Save the tidy model output into an object
+tidy_m &lt;- tidy(m)
+
+# Plot the coefficient estimates with 95% CI for each term in the model
+tidy_m %&gt;%
+  ggplot(aes(x = term, y = estimate)) + 
+  geom_pointrange(aes(ymin = estimate - 1.96 * std.error, 
+                      ymax = estimate + 1.96 * std.error)) +
+  geom_hline(yintercept = 0)</code></pre>
+<p><img src="/posts/Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="generating-insights" class="section level2">
+<h2>8. Generating insights</h2>
+<p>Based on the coefficient estimate plot and the model output table, there is enough information to generate insights about the study. Is treatment A superior to B after taking into account the effect of stone size/severity level?</p>
+<p>Recall, a coefficient represents the effect size of the specific model term. A positive coefficient means that the term is positively related to the outcome. For categorical predictors, the coefficient is the effect on the outcome relative to the reference category. In the study, stone size large and treatment A are the reference categories.</p>
+<p>Is small stone more likely to be a success after controlling for treatment option effect?</p>
+<p><strong>Yes</strong></p>
+<p>Is treatment A significantly better than B?</p>
+<p><strong>No</strong></p>
+</div>
+
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/r-markdown">R Markdown</a></span><span class="tag"><a href="/tags/plot">plot</a></span><span class="tag"><a href="/tags/graph">graph</a></span><span class="tag"><a href="/tags/logistic-regression">logistic regression</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>1170 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-06-29 19:13 -0700</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="prev-post" href="/posts/peer_influence/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Peer Influence for a music-streaming company</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 <a href="/">Pablo Barajas</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+
+	<script src="/js/bundle.min.490e43e5af6db5906f28afa49a4e16bf9f626b758e3fca92f146b870eb94bb37.js" integrity="sha256-SQ5D5a9ttZBvKK+kmk4Wv59ia3WOP8qS8Ua4cOuUuzc=" crossorigin="anonymous"></script>
+	
+
+</body>
+
+</html>

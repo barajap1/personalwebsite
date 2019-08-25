@@ -1,0 +1,157 @@
+---
+title: "Amazon Network Analysis"
+author: "Pablo"
+date: 2019-03-13T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "graph"]
+output:
+    prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+
+
+<div id="amazon-network-analysis" class="section level2">
+<h2>Amazon Network Analysis</h2>
+<pre class="r"><code># Load relevant packages
+library(car)
+library(dplyr)
+library(tidyr)
+library(igraph)
+library(ggplot2)
+library(corrplot)</code></pre>
+<pre class="r"><code>head(products)</code></pre>
+<pre><code>##   id                                                             title
+## 1  1                           Patterns of Preaching: A Sermon Sampler
+## 2  2                                        Candlemas: Feast of Flames
+## 3  3                  World War II Allied Fighter Planes Trading Cards
+## 4  4      Life Application Bible Commentary: 1 and 2 Timothy and Titus
+## 5  5                   Prayers That Avail Much for Business: Executive
+## 6  6 How the Other Half Lives: Studies Among the Tenements of New York
+##   group salesrank review_cnt downloads rating
+## 1  Book    396585          2         2    5.0
+## 2  Book    168596         12        12    4.5
+## 3  Book   1270652          1         1    5.0
+## 4  Book    631289          1         1    4.0
+## 5  Book    455160          0         0    0.0
+## 6  Book    188784         17        17    4.0</code></pre>
+<pre class="r"><code>head(copurchase)</code></pre>
+<pre><code>##   Source Target
+## 1      1      2
+## 2      1      4
+## 3      1      5
+## 4      1     15
+## 5      2     11
+## 6      2     12</code></pre>
+<pre class="r"><code>#We are onluy interested in a subset of this dataset, we want to look for Books 
+books.products &lt;- filter(products, group == &quot;Book&quot; 
+                         &amp; salesrank &lt;= 150000 &amp; salesrank &gt;= 0)
+
+books.copurchase &lt;- filter(copurchase, Source %in% books.products$id
+                           &amp; Target %in% books.products$id)</code></pre>
+<pre class="r"><code>#We want to find the ID with the highest indegree (For a vertex, the number of head ends adjacent to a vertex is called the indegree of the vertex)
+indegree.df &lt;- summarize(group_by(books.copurchase, Target), indegree = n()) %&gt;% arrange(desc(indegree))
+names(indegree.df)[1]&lt;-&quot;id&quot;
+head(indegree.df)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##      id indegree
+##   &lt;int&gt;    &lt;int&gt;
+## 1  4429       46
+## 2    33       44
+## 3   244       35
+## 4   302       22
+## 5  5913       20
+## 6   626       16</code></pre>
+<pre class="r"><code>##We want to find the ID with the highest outdegree (the number of tail ends adjacent to a vertex is its outdegree)
+outdegree.df &lt;- summarize(group_by(books.copurchase, Source), outdegree = n()) %&gt;% arrange(desc(outdegree))
+names(outdegree.df)[1]&lt;-&quot;id&quot;
+head(outdegree.df)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##       id outdegree
+##    &lt;int&gt;     &lt;int&gt;
+## 1 126396         5
+## 2 151687         5
+## 3   4993         4
+## 4  26268         4
+## 5  28040         4
+## 6  29680         4</code></pre>
+<pre class="r"><code>books.graph &lt;- merge(books.products, indegree.df, by=&quot;id&quot;, all.x = TRUE)  #Merge the Dataframes
+books.graph &lt;- merge(books.graph, outdegree.df, by=&quot;id&quot;, all.x = TRUE)  #Merge the Dataframes
+books.graph$indegree[is.na(books.graph$indegree)] &lt;- 0     #ssign 0 to those who are na
+books.graph$outdegree[is.na(books.graph$outdegree)] &lt;- 0  #assign 0 to those who are na
+books.graph &lt;- mutate(books.graph, degree = indegree + outdegree) # sum indegree and outdegree to create degree
+head(books.graph)</code></pre>
+<pre><code>##   id
+## 1 12
+## 2 33
+## 3 39
+## 4 45
+## 5 74
+## 6 77
+##                                                                                                      title
+## 1 Fantastic Food with Splenda : 160 Great Recipes for Meals Low in Sugar, Carbohydrates, Fat, and Calories
+## 2                                                                           Double Jeopardy (T*Witches, 6)
+## 3                                                                           Night of Many Dreams : A Novel
+## 4                                                                     Beginning ASP.NET Databases using C#
+## 5                                                      Service Delivery (It Infrastructure Library Series)
+## 6                                                                                     Water Touching Stone
+##   group salesrank review_cnt downloads rating indegree outdegree degree
+## 1  Book     24741         12        12    4.5        5         1      6
+## 2  Book     97166          4         4    5.0       44         0     44
+## 3  Book     57186         22        22    3.5        4         0      4
+## 4  Book     48408          4         4    4.0        0         0      0
+## 5  Book     27507          2         2    4.0        1         1      2
+## 6  Book     27012         11        11    4.5        3         1      4</code></pre>
+<pre class="r"><code>#We are looking for the book with highest degree
+filter(books.graph, degree == max(books.graph$degree))</code></pre>
+<pre><code>##     id                                    title group salesrank review_cnt
+## 1 4429 Harley-Davidson Panheads, 1948-1965/M418  Book    147799          3
+##   downloads rating indegree outdegree degree
+## 1         3    4.5       46         1     47</code></pre>
+<pre class="r"><code>g &lt;- graph_from_data_frame(books.copurchase, directed = TRUE)    #we creathe a directed graph
+sg &lt;- induced_subgraph(g, subcomponent(g, &quot;4429&quot;, &quot;all&quot;), impl = &quot;auto&quot;)  #we are only interested in id &quot;4429&quot;
+sg &lt;- simplify(sg, remove.multiple = F, remove.loops = T)
+V(sg)</code></pre>
+<pre><code>## + 756/756 vertices, named, from 2bed862:
+##   [1] 77     130    148    187    193    224    321    322    422    556   
+##  [11] 577    626    724    1051   1644   1817   1822   1851   1971   2071  
+##  [21] 2210   2279   2285   2326   2330   2332   2343   2423   2470   2501  
+##  [31] 2505   2558   2572   2657   2658   2806   2807   2959   3032   3119  
+##  [41] 3191   3217   3306   3588   3670   3737   3861   3909   4002   4014  
+##  [51] 4068   4099   4140   4174   4184   4185   4222   4223   4345   4429  
+##  [61] 4977   4993   4994   5018   5163   5164   5293   5355   5388   5623  
+##  [71] 5638   5639   5655   5670   5821   5851   5875   6012   6014   6392  
+##  [81] 6411   6445   6546   6711   6713   6817   6942   7196   7198   7222  
+##  [91] 7233   7325   7376   7406   7544   7743   7754   7775   7839   7841  
+## + ... omitted several vertices</code></pre>
+<pre class="r"><code>E(sg)</code></pre>
+<pre><code>## + 986/986 edges from 2bed862 (vertex names):
+##  [1] 77  -&gt;422  130 -&gt;78   148 -&gt;302  187 -&gt;321  187 -&gt;322  187 -&gt;78  
+##  [7] 193 -&gt;224  224 -&gt;193  224 -&gt;33   321 -&gt;187  321 -&gt;322  321 -&gt;78  
+## [13] 322 -&gt;187  322 -&gt;321  322 -&gt;78   422 -&gt;77   422 -&gt;1644 556 -&gt;78  
+## [19] 577 -&gt;33   626 -&gt;33   724 -&gt;302  1051-&gt;302  1644-&gt;422  1644-&gt;5293
+## [25] 1817-&gt;976  1822-&gt;193  1822-&gt;724  1851-&gt;78   1971-&gt;193  2071-&gt;3155
+## [31] 2210-&gt;2279 2210-&gt;2285 2279-&gt;2210 2279-&gt;2326 2285-&gt;2330 2326-&gt;193 
+## [37] 2326-&gt;2210 2330-&gt;2343 2330-&gt;2345 2332-&gt;4140 2343-&gt;2285 2343-&gt;2330
+## [43] 2423-&gt;5410 2470-&gt;556  2501-&gt;3588 2505-&gt;2501 2558-&gt;33   2572-&gt;4184
+## [49] 2572-&gt;4185 2657-&gt;2658 2658-&gt;77   2806-&gt;2807 2807-&gt;302  2959-&gt;1673
+## [55] 3032-&gt;2558 3119-&gt;976  3191-&gt;2279 3217-&gt;4319 3306-&gt;2071 3306-&gt;4345
+## + ... omitted several edges</code></pre>
+<pre class="r"><code>diameter &lt;- get_diameter(sg)
+diameter</code></pre>
+<pre><code>## + 10/756 vertices, named, from 2bed862:
+##  [1] 37895 27936 21584 10889 11080 14111 4429  2501  3588  6676</code></pre>
+<pre class="r"><code>#Plot the graph for id &quot;4429&quot;
+
+V(sg)$color &lt;- ifelse(V(sg)$name %in% diameter$name, &quot;red&quot;, &quot;lightblue&quot;)
+V(sg)[&quot;4429&quot;]$color &lt;- &quot;green&quot;
+V(sg)[&quot;33&quot;]$color &lt;- &quot;gold&quot;
+E(sg)$color &lt;- &quot;darkgray&quot;
+E(sg,path=diameter)$color &lt;- &quot;red&quot;
+E(sg)$width &lt;- 1
+E(sg,path=diameter)$width &lt;- 3
+options(repr.plot.width = 100, repr.plot.height = 100)
+plot(sg, layout=layout_with_fr, vertex.size=1, vertex.label=NA, edge.arrow.size=0.05)</code></pre>
+<p><img src="/posts/2019-03-13-Amazon-Network-Analysis_files/figure-html/fig1-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>

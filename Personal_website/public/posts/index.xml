@@ -1,0 +1,3320 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Posts on Pablo Barajas</title>
+		<link>/posts/</link>
+		<description>Recent content in Posts on Pablo Barajas</description>
+		<generator>Hugo -- gohugo.io</generator>
+		<language>en-us</language>
+		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+		<lastBuildDate>Sat, 29 Jun 2019 21:13:14 -0500</lastBuildDate>
+		<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Kidney Stones and Simpson&#39;s Paradox</title>
+			<link>/posts/kidney_stones_simpsons_paradox/</link>
+			<pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
+			
+			<guid>/posts/kidney_stones_simpsons_paradox/</guid>
+			<description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
+			<content type="html"><![CDATA[
+
+
+<div id="a-new-look-at-an-old-research-study" class="section level2">
+<h2>1. A new look at an old research study</h2>
+<p>In 1986, a group of urologists in London published a research paper in <strong>The British Medical Journal</strong> that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate. What is going on here? This known statistical phenomenon is called Simpon’s paradox. Simpon’s paradox occurs when trends appear in subgroups but disappear or reverse when subgroups are combined.THis tutorial will explore Simpon’s paradox using multiple regression and other statistical tools.</p>
+<pre class="r"><code># packages
+library(data.table) #for Data Manipulation and for fast reading and writing data
+library(dplyr) #for Data Manipulation
+library(pander) #for nicer output
+library(ggplot2) #for visualizations
+library(broom) #to tidy up
+
+# Reading datasets kidney_stone_data.csv into data
+data &lt;- fread(&quot;Data/kidney_stone_data.csv&quot;)
+
+# Taking a look at the first few rows of the dataset
+pander(head(data))</code></pre>
+<table style="width:49%;">
+<colgroup>
+<col width="16%" />
+<col width="18%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">treatment</th>
+<th align="center">stone_size</th>
+<th align="center">success</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="recreate-the-treatment-x-success-summary-table" class="section level2">
+<h2>2. Recreate the Treatment X Success summary table</h2>
+<p>The data contains three columns: <code>treatment</code> (A or B), <code>stone_size</code> (large or small) and <code>success</code> (0 = Failure or 1 = Success). To start, we want to know which treatment had a higher success rate regardless of stone size. Let’s create a table with the number of successes and frequency of success by each treatment using the tidyverse syntax.</p>
+<pre class="r"><code># Calculating the number and frequency of success and failure of each treatment 
+data %&gt;% 
+  group_by(treatment, success) %&gt;%
+  summarise(N = n()) %&gt;% 
+  mutate(Freq = round(N/sum(N), 3))</code></pre>
+<pre><code>## # A tibble: 4 x 4
+## # Groups:   treatment [2]
+##   treatment success     N  Freq
+##   &lt;chr&gt;       &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 A               0    77 0.22 
+## 2 A               1   273 0.78 
+## 3 B               0    61 0.174
+## 4 B               1   289 0.826</code></pre>
+</div>
+<div id="bringing-stone-size-into-the-picture" class="section level2">
+<h2>3. Bringing stone size into the picture</h2>
+<p>From the treatment and success rate descriptive table, we saw that treatment B performed better on average compared to treatment A (82% vs. 78% success rate). Now, let’s consider stone size and see what happens. We are going to stratify the data into small vs. large stone subcategories and compute the same success count and rate by treatment like we did in the previous task.</p>
+<p>The final table will be treatment X stone size X success.</p>
+<pre class="r"><code># Calculating number and frequency of success and failure by stone size for each treatment
+sum_data &lt;- 
+  data %&gt;% 
+  group_by(treatment, stone_size, success) %&gt;%
+  summarise(N = n()) %&gt;%
+  mutate(Freq = round(N/sum(N),3))
+
+# Printing out the data frame we just created
+pander(sum_data)</code></pre>
+<table style="width:68%;">
+<colgroup>
+<col width="16%" />
+<col width="18%" />
+<col width="13%" />
+<col width="8%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">treatment</th>
+<th align="center">stone_size</th>
+<th align="center">success</th>
+<th align="center">N</th>
+<th align="center">Freq</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">0</td>
+<td align="center">71</td>
+<td align="center">0.27</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">large</td>
+<td align="center">1</td>
+<td align="center">192</td>
+<td align="center">0.73</td>
+</tr>
+<tr class="odd">
+<td align="center">A</td>
+<td align="center">small</td>
+<td align="center">0</td>
+<td align="center">6</td>
+<td align="center">0.069</td>
+</tr>
+<tr class="even">
+<td align="center">A</td>
+<td align="center">small</td>
+<td align="center">1</td>
+<td align="center">81</td>
+<td align="center">0.931</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">0</td>
+<td align="center">25</td>
+<td align="center">0.312</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">large</td>
+<td align="center">1</td>
+<td align="center">55</td>
+<td align="center">0.688</td>
+</tr>
+<tr class="odd">
+<td align="center">B</td>
+<td align="center">small</td>
+<td align="center">0</td>
+<td align="center">36</td>
+<td align="center">0.133</td>
+</tr>
+<tr class="even">
+<td align="center">B</td>
+<td align="center">small</td>
+<td align="center">1</td>
+<td align="center">234</td>
+<td align="center">0.867</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="when-in-doubt-rely-on-a-plot" class="section level2">
+<h2>4. When in doubt, rely on a plot</h2>
+<p>What is going on here? When stratified by stone size, treatment A had better results for both large and small stones compared to treatment B (i.e., 73% and 93% v.s. 69% and 87%). Sometimes a plot is a more efficient way to communicate hidden numerical information in the data. In this task, we are going to apply a plotting technique to reveal the hidden information.</p>
+<pre class="r"><code># Creating a bar plot to show stone size count within each treatment
+sum_data %&gt;%
+  ggplot(aes(x = treatment, y = N)) + 
+  geom_bar(aes(fill = stone_size), stat=&quot;identity&quot;) </code></pre>
+<p><img src="/posts/Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="identify-and-confirm-the-lurking-variable" class="section level2">
+<h2>5. Identify and confirm the lurking variable</h2>
+<p>From the bar plot, we noticed an unbalanced distribution of kidney stone sizes in the two treatment options. Large kidney stone cases tended to be in treatment A, while small kidney stone cases tended to be in treatment B. Can we confirm this hypothesis with statistical testing?</p>
+<p>Analizing the association between stone size (i.e., case severity) and treatment assignment using a statistical test called <strong>Chi-squared</strong>. The <strong>Chi-squared</strong> test is appropriate to test associations between two categorical variables. This test result, together with the common knowledge that a more severe case would be more likely to fail regardless of treatment, will shed light on the root cause of the paradox.</p>
+<pre class="r"><code># Run a Chi-squared test
+trt_ss &lt;- chisq.test(data$treatment, data$stone_size)
+
+# Print out the result in tidy format 
+tidy(trt_ss)</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   statistic  p.value parameter method                                      
+##       &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt; &lt;chr&gt;                                       
+## 1      189. 4.40e-43         1 Pearson&#39;s Chi-squared test with Yates&#39; cont~</code></pre>
+</div>
+<div id="remove-the-confounding-effect" class="section level2">
+<h2>6. Remove the confounding effect</h2>
+<p>Now,we are confident that stone size/case severity is indeed the lurking variable (aka, confounding variable) in this study of kidney stone treatment and success rate. The good news is that there are ways to get rid of the effect of the lurking variable.</p>
+<p>Let’s practice using multiple logistic regression to remove the unwanted effect of stone size, and then tidy the output with a function from the <code>broom</code> package</p>
+<pre class="r"><code># Running a multiple logistic regression
+m &lt;- glm(data = data, success ~  stone_size + treatment, family = &quot;binomial&quot;)
+
+# Print out model coefficient table in tidy format
+pander(tidy(m))</code></pre>
+<table style="width:90%;">
+<colgroup>
+<col width="25%" />
+<col width="15%" />
+<col width="16%" />
+<col width="16%" />
+<col width="16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">term</th>
+<th align="center">estimate</th>
+<th align="center">std.error</th>
+<th align="center">statistic</th>
+<th align="center">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">(Intercept)</td>
+<td align="center">1.033</td>
+<td align="center">0.1345</td>
+<td align="center">7.684</td>
+<td align="center">1.546e-14</td>
+</tr>
+<tr class="even">
+<td align="center">stone_sizesmall</td>
+<td align="center">1.261</td>
+<td align="center">0.239</td>
+<td align="center">5.274</td>
+<td align="center">1.333e-07</td>
+</tr>
+<tr class="odd">
+<td align="center">treatmentB</td>
+<td align="center">-0.3572</td>
+<td align="center">0.2291</td>
+<td align="center">-1.559</td>
+<td align="center">0.1189</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="visualize-model-output" class="section level2">
+<h2>7. Visualize model output</h2>
+<p>We successfully fit a multiple logistic regression and pulled out the model coefficient estimates! Typically (and arbitrarily), P-values below 0.05 indicate statistical significance. Another way to examine whether a significant relationship exists or not is to look at the 95% confidence interval (CI) of the estimate. In our example, we are testing to see:</p>
+<ul>
+<li>if the effect of a small stone is the same as a big stone</li>
+<li>if treatment A is as effective as treatment B.</li>
+</ul>
+<p>If the 95% CI for the coefficient estimates cover zero, we cannot conclude that one is different from the other. Otherwise, there is a significant effect.</p>
+<pre class="r"><code># Save the tidy model output into an object
+tidy_m &lt;- tidy(m)
+
+# Plot the coefficient estimates with 95% CI for each term in the model
+tidy_m %&gt;%
+  ggplot(aes(x = term, y = estimate)) + 
+  geom_pointrange(aes(ymin = estimate - 1.96 * std.error, 
+                      ymax = estimate + 1.96 * std.error)) +
+  geom_hline(yintercept = 0)</code></pre>
+<p><img src="/posts/Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="generating-insights" class="section level2">
+<h2>8. Generating insights</h2>
+<p>Based on the coefficient estimate plot and the model output table, there is enough information to generate insights about the study. Is treatment A superior to B after taking into account the effect of stone size/severity level?</p>
+<p>Recall, a coefficient represents the effect size of the specific model term. A positive coefficient means that the term is positively related to the outcome. For categorical predictors, the coefficient is the effect on the outcome relative to the reference category. In the study, stone size large and treatment A are the reference categories.</p>
+<p>Is small stone more likely to be a success after controlling for treatment option effect?</p>
+<p><strong>Yes</strong></p>
+<p>Is treatment A significantly better than B?</p>
+<p><strong>No</strong></p>
+</div>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Peer Influence for a music-streaming company</title>
+			<link>/posts/peer_influence/</link>
+			<pubDate>Tue, 16 Apr 2019 21:13:14 -0500</pubDate>
+			
+			<guid>/posts/peer_influence/</guid>
+			<description>Peer Influence for a music-streaming company# Load relevant packageslibrary(dplyr)library(ggplot2)library(corrplot)library(MatchIt)library(psych)library(GGally)library(gridExtra)#read the datasetHigh_Note &amp;lt;- read.csv(&amp;quot;Data/peer_influence.csv&amp;quot;, header = TRUE)describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)## ## Descriptive statistics by group ## group: 0## vars n mean sd median trimmed## ï..ID 1 40300 20150.50 11633.75 20150.50 20150.50## age 2 40300 23.95 6.37 23.00 23.09## male 3 40300 0.</description>
+			<content type="html"><![CDATA[
+
+
+<div id="peer-influence-for-a-music-streaming-company" class="section level2">
+<h2>Peer Influence for a music-streaming company</h2>
+<pre class="r"><code># Load relevant packages
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+library(MatchIt)
+library(psych)
+library(GGally)
+library(gridExtra)</code></pre>
+<pre class="r"><code>#read the dataset
+High_Note &lt;- read.csv(&quot;Data/peer_influence.csv&quot;, header = TRUE)</code></pre>
+<pre class="r"><code>describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)</code></pre>
+<pre><code>## 
+##  Descriptive statistics by group 
+## group: 0
+##                       vars     n     mean       sd   median  trimmed
+## ï..ID                    1 40300 20150.50 11633.75 20150.50 20150.50
+## age                      2 40300    23.95     6.37    23.00    23.09
+## male                     3 40300     0.62     0.48     1.00     0.65
+## friend_cnt               4 40300    18.49    57.48     7.00    10.28
+## avg_friend_age           5 40300    24.01     5.10    23.00    23.40
+## avg_friend_male          6 40300     0.62     0.32     0.67     0.65
+## friend_country_cnt       7 40300     3.96     5.76     2.00     2.66
+## subscriber_friend_cnt    8 40300     0.42     2.42     0.00     0.13
+## songsListened            9 40300 17589.44 28416.02  7440.00 11817.64
+## lovedTracks             10 40300    86.82   263.58    14.00    36.35
+## posts                   11 40300     5.29   104.31     0.00     0.23
+## playlists               12 40300     0.55     1.07     0.00     0.45
+## shouts                  13 40300    29.97   150.69     4.00     8.84
+## adopter                 14 40300     0.00     0.00     0.00     0.00
+## tenure                  15 40300    43.81    19.79    44.00    43.72
+## good_country            16 40300     0.36     0.48     0.00     0.32
+##                            mad min     max   range  skew kurtosis     se
+## ï..ID                 14937.19   1   40300   40299  0.00    -1.20  57.95
+## age                       4.45   8      79      71  1.97     6.80   0.03
+## male                      0.00   0       1       1 -0.50    -1.75   0.00
+## friend_cnt                7.41   1    4957    4956 32.67  2087.42   0.29
+## avg_friend_age            3.95   8      77      69  1.84     7.15   0.03
+## avg_friend_male           0.35   0       1       1 -0.52    -0.72   0.00
+## friend_country_cnt        1.48   0     129     129  4.74    38.29   0.03
+## subscriber_friend_cnt     0.00   0     309     309 72.19  8024.62   0.01
+## songsListened         10576.87   0 1000000 1000000  6.05   105.85 141.55
+## lovedTracks              20.76   0   12522   12522 13.12   335.93   1.31
+## posts                     0.00   0   12309   12309 73.92  7005.34   0.52
+## playlists                 0.00   0      98      98 28.21  1945.28   0.01
+## shouts                    4.45   0    7736    7736 22.53   779.12   0.75
+## adopter                   0.00   0       0       0   NaN      NaN   0.00
+## tenure                   22.24   1     111     110  0.05    -0.70   0.10
+## good_country              0.00   0       1       1  0.59    -1.65   0.00
+## -------------------------------------------------------- 
+## group: 1
+##                       vars    n     mean       sd   median  trimmed
+## ï..ID                    1 3527 42064.00  1018.30 42064.00 42064.00
+## age                      2 3527    25.98     6.84    24.00    25.05
+## male                     3 3527     0.73     0.44     1.00     0.79
+## friend_cnt               4 3527    39.73   117.27    16.00    23.69
+## avg_friend_age           5 3527    25.44     5.21    24.36    24.83
+## avg_friend_male          6 3527     0.64     0.25     0.67     0.65
+## friend_country_cnt       7 3527     7.19     8.86     4.00     5.36
+## subscriber_friend_cnt    8 3527     1.64     5.85     0.00     0.84
+## songsListened            9 3527 33758.04 43592.73 20908.00 25811.69
+## lovedTracks             10 3527   264.34   491.43   108.00   161.68
+## posts                   11 3527    21.20   221.99     0.00     1.44
+## playlists               12 3527     0.90     2.56     1.00     0.59
+## shouts                  13 3527    99.44  1156.07     9.00    23.89
+## adopter                 14 3527     1.00     0.00     1.00     1.00
+## tenure                  15 3527    45.58    20.04    46.00    45.60
+## good_country            16 3527     0.29     0.45     0.00     0.23
+##                            mad   min    max  range  skew kurtosis     se
+## ï..ID                  1307.65 40301  43827   3526  0.00    -1.20  17.15
+## age                       4.45     8     73     65  1.68     4.39   0.12
+## male                      0.00     0      1      1 -1.03    -0.94   0.01
+## friend_cnt               17.79     1   5089   5088 26.04  1013.79   1.97
+## avg_friend_age            3.91    12     62     50  1.68     5.05   0.09
+## avg_friend_male           0.25     0      1      1 -0.54    -0.05   0.00
+## friend_country_cnt        4.45     0    136    136  3.61    24.53   0.15
+## subscriber_friend_cnt     0.00     0    287    287 34.05  1609.52   0.10
+## songsListened         23276.82     0 817290 817290  4.71    46.64 734.03
+## lovedTracks             140.85     0  10220  10220  6.52    80.96   8.27
+## posts                     0.00     0   8506   8506 26.52   852.38   3.74
+## playlists                 1.48     0    118    118 28.84  1244.31   0.04
+## shouts                   11.86     0  65872  65872 52.52  2969.09  19.47
+## adopter                   0.00     1      1      0   NaN      NaN   0.00
+## tenure                   20.76     0    111    111  0.02    -0.62   0.34
+## good_country              0.00     0      1      1  0.94    -1.12   0.01</code></pre>
+<pre class="r"><code>#Take log of variables where values are too large compared to the others
+High_Note &lt;- High_Note %&gt;% mutate(ln_songsListened = log(songsListened + 1))
+High_Note &lt;- High_Note %&gt;% mutate(ln_lovedTracks = log(lovedTracks + 1))</code></pre>
+<pre class="r"><code>#Start with some visualizations
+ggcorr(High_Note, palette = &quot;RdBu&quot;, label = TRUE)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig1-1.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>pairs(~age+friend_cnt+ln_songsListened+posts, col=High_Note$adopter, data=High_Note, main=&quot;Scatterplot Matrix&quot;)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig1-2.png" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Demographics
+Age_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = age)) + geom_boxplot(aes(fill = factor(adopter))) + labs(x = &quot;Adopter&quot;)
+Age_plot</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>Age_plotbygender &lt;- ggplot(High_Note, aes(x=factor(adopter), y=age, color = factor(male))) + geom_boxplot() + labs(x = &quot;Adopter&quot;)
+Age_plotbygender</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#Peer influence
+friend_cnt_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = friend_cnt)) + geom_boxplot(aes(fill = factor(adopter))) +ylim(0, 1250) +
+  labs(x = &quot;Adopter&quot;)
+friend_cnt_plot</code></pre>
+<pre><code>## Warning: Removed 13 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig3-1.png" width="672" /></p>
+<pre class="r"><code>subscriber_friend_cnt_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = subscriber_friend_cnt)) + 
+  geom_boxplot(aes(fill = factor(adopter))) + ylim(0, 50)  + labs(x = &quot;Adopter&quot;)
+subscriber_friend_cnt_plot</code></pre>
+<pre><code>## Warning: Removed 9 rows containing non-finite values (stat_boxplot).</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig3-2.png" width="672" /></p>
+<pre class="r"><code>#user engagement 
+ln_songsListened_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = ln_songsListened)) + geom_boxplot(aes(fill = factor(adopter)))
+ln_songsListened_plot</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ln_lovedTracks_plot &lt;- ggplot(High_Note, aes(x = factor(adopter), y = ln_lovedTracks)) + geom_boxplot(aes(fill = factor(adopter)))
+ln_lovedTracks_plot</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/fig4-2.png" width="672" style="display: block; margin: auto;" />
+##Propensity Score Matching</p>
+<pre class="r"><code>#Transform subscriber friend count into the Treatment and control variable with Treatment being 1 and Control being 0
+High_Note$Treatment &lt;- ifelse(High_Note$subscriber_friend_cnt &gt;= 1, 1, 0)</code></pre>
+<pre class="r"><code>#For those who have 1 or more subscriber friends, on average 18% of them are premuim subsribers, 
+# while those who have 0 subscriber friends, on average 5%  of them are premium subscribers. 
+
+High_Note %&gt;%
+  group_by(Treatment) %&gt;%
+  summarise(mean_adopter = mean(adopter))</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   Treatment mean_adopter
+##       &lt;dbl&gt;        &lt;dbl&gt;
+## 1         0       0.0524
+## 2         1       0.178</code></pre>
+<pre class="r"><code>with(High_Note, t.test(adopter ~ Treatment))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  adopter by Treatment
+## t = -30.961, df = 11815, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.1330281 -0.1171869
+## sample estimates:
+## mean in group 0 mean in group 1 
+##      0.05243501      0.17754250</code></pre>
+</div>
+<div id="difference-in-means-pre-treatment-covariates" class="section level1">
+<h1>Difference-in-means: pre-treatment covariates</h1>
+</div>
+<div id="lets-calculate-the-mean-for-each-covariate" class="section level1">
+<h1>Let’s calculate the mean for each covariate</h1>
+<pre class="r"><code>High_Note_cov &lt;- c(&quot;age&quot;,&quot;male&quot;,&quot;friend_cnt&quot;,&quot;avg_friend_age&quot;,&quot;avg_friend_male&quot;,&quot;friend_country_cnt&quot;,&quot;ln_songsListened&quot;, 
+              &quot;ln_lovedTracks&quot;,&quot;posts&quot;,&quot;playlists&quot;,&quot;shouts&quot;, &quot;tenure&quot;,&quot;good_country&quot;)
+High_Note %&gt;%
+  group_by(Treatment) %&gt;%
+  select(one_of(High_Note_cov)) %&gt;%
+  summarise_all(funs(mean(., na.rm = T)))</code></pre>
+<pre><code>## Adding missing grouping variables: `Treatment`</code></pre>
+<pre><code>## Warning: funs() is soft deprecated as of dplyr 0.8.0
+## Please use a list of either functions or lambdas: 
+## 
+##   # Simple named list: 
+##   list(mean = mean, median = median)
+## 
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## This warning is displayed once per session.</code></pre>
+<pre><code>## # A tibble: 2 x 14
+##   Treatment   age  male friend_cnt avg_friend_age avg_friend_male
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+## 1         0  23.7 0.629       10.4           23.8           0.613
+## 2         1  25.4 0.636       54.0           25.4           0.636
+## # ... with 8 more variables: friend_country_cnt &lt;dbl&gt;,
+## #   ln_songsListened &lt;dbl&gt;, ln_lovedTracks &lt;dbl&gt;, posts &lt;dbl&gt;,
+## #   playlists &lt;dbl&gt;, shouts &lt;dbl&gt;, tenure &lt;dbl&gt;, good_country &lt;dbl&gt;</code></pre>
+<pre class="r"><code>#T-test
+list_of_var &lt;- c(&quot;age&quot;,&quot;male&quot;,&quot;friend_cnt&quot;,&quot;avg_friend_age&quot;,&quot;avg_friend_male&quot;,&quot;friend_country_cnt&quot;,&quot;ln_songsListened&quot;, 
+              &quot;ln_lovedTracks&quot;,&quot;posts&quot;,&quot;playlists&quot;,&quot;shouts&quot;, &quot;tenure&quot;,&quot;good_country&quot;)
+lapply(list_of_var, function(v) {
+  t.test(High_Note[, v] ~ High_Note$Treatment)
+})</code></pre>
+<pre><code>## [[1]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -20.841, df = 14645, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.778544 -1.472749
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        23.74756        25.37321 
+## 
+## 
+## [[2]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -1.3459, df = 15986, p-value = 0.1784
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.018236129  0.003388028
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6288378       0.6362618 
+## 
+## 
+## [[3]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -33.707, df = 9903.1, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -46.12459 -41.05469
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        10.43133        54.02097 
+## 
+## 
+## [[4]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -27.658, df = 15667, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.744514 -1.513611
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        23.76137        25.39043 
+## 
+## 
+## [[5]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -7.7114, df = 23020, p-value = 1.294e-14
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.02846397 -0.01692672
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6131124       0.6358077 
+## 
+## 
+## [[6]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -65.05, df = 10372, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -6.861271 -6.459857
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        2.725062        9.385626 
+## 
+## 
+## [[7]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -72.169, df = 24545, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.702958 -1.612902
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        7.944104        9.602034 
+## 
+## 
+## [[8]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -64.938, df = 15507, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -1.557214 -1.465962
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        2.446598        3.958186 
+## 
+## 
+## [[9]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -7.3649, df = 9933.6, p-value = 1.914e-13
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -22.76492 -13.19424
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        2.543377       20.522956 
+## 
+## 
+## [[10]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -10.492, df = 11238, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.2546958 -0.1745100
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.5294671       0.7440700 
+## 
+## 
+## [[11]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -11.426, df = 9888.1, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -100.04703  -70.74591
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        16.42304       101.81951 
+## 
+## 
+## [[12]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = -14.696, df = 15805, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -3.792309 -2.899752
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        43.20268        46.54871 
+## 
+## 
+## [[13]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  High_Note[, v] by High_Note$Treatment
+## t = 2.0956, df = 16030, p-value = 0.03613
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.0007383591 0.0220968020
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.3546936       0.3432760</code></pre>
+<p>Propensity score estimation
+We estimate the propensity score by running a logit model (probit also works)
+where the outcome variable is a binary variable indicating treatment status.
+what covariates should we include? For the matching to give you a causal estimate
+in the end, you need to include any covariate that is related to both the treatment
+assignment and potential outcomes. Therefore at this moment I choose to include all variables</p>
+<pre class="r"><code>m_ps &lt;- glm(Treatment ~ age + male + friend_cnt + avg_friend_age + avg_friend_male + friend_country_cnt +  
+               ln_songsListened + ln_lovedTracks + posts + playlists + shouts + tenure + good_country,
+             family = binomial(), data = High_Note)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summary(m_ps)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Treatment ~ age + male + friend_cnt + avg_friend_age + 
+##     avg_friend_male + friend_country_cnt + ln_songsListened + 
+##     ln_lovedTracks + posts + playlists + shouts + tenure + good_country, 
+##     family = binomial(), data = High_Note)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -4.1675  -0.5870  -0.4007  -0.1806   6.8050  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -6.7989512  0.1066723 -63.737  &lt; 2e-16 ***
+## age                 0.0211928  0.0028963   7.317 2.53e-13 ***
+## male                0.0127828  0.0303040   0.422  0.67316    
+## friend_cnt          0.0281816  0.0010230  27.549  &lt; 2e-16 ***
+## avg_friend_age      0.0836847  0.0036034  23.224  &lt; 2e-16 ***
+## avg_friend_male     0.2322512  0.0524685   4.426 9.58e-06 ***
+## friend_country_cnt  0.1021891  0.0046711  21.877  &lt; 2e-16 ***
+## ln_songsListened    0.1700614  0.0088009  19.323  &lt; 2e-16 ***
+## ln_lovedTracks      0.1282609  0.0076995  16.658  &lt; 2e-16 ***
+## posts               0.0006760  0.0002331   2.900  0.00373 ** 
+## playlists          -0.0108768  0.0131725  -0.826  0.40897    
+## shouts             -0.0004121  0.0001525  -2.703  0.00688 ** 
+## tenure             -0.0031864  0.0007966  -4.000 6.33e-05 ***
+## good_country        0.0032863  0.0293230   0.112  0.91077    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 46640  on 43826  degrees of freedom
+## Residual deviance: 33588  on 43813  degrees of freedom
+## AIC: 33616
+## 
+## Number of Fisher Scoring iterations: 25</code></pre>
+<p>Using this model, we can now calculate the propensity score for each user
+It is simply the user’s predicted probability of being Treated,
+given the estimates from the logit model.</p>
+<pre class="r"><code>prs_df &lt;- data.frame(pr_score = predict(m_ps, type = &quot;response&quot;),
+                     Treatment = m_ps$model$Treatment)
+head(prs_df)</code></pre>
+<pre><code>##     pr_score Treatment
+## 1 0.12150210         0
+## 2 0.03447076         0
+## 3 0.04815195         0
+## 4 0.22831497         1
+## 5 0.65092056         0
+## 6 0.18205340         0</code></pre>
+<p>Examining the region of common support
+After estimating the propensity score, it is useful to plot histograms of the estimated propensity scores by treatment status</p>
+<pre class="r"><code>labs &lt;- paste(&quot;Treatment type:&quot;, c(&quot;1 or more friends&quot;, &quot;0 friends&quot;))
+prs_df %&gt;%
+  mutate(SubscriberType = ifelse(Treatment == 1, labs[1], labs[2])) %&gt;%
+  ggplot(aes(x = pr_score)) +
+  geom_histogram(color = &quot;white&quot;, binwidth = 0.025) +
+  facet_wrap(~SubscriberType) +
+  xlab(&quot;Probability of Treatment&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>The method we use below is to find pairs of observations that have very similar propensity scores,
+but that differ in their treatment status. We use the package MatchIt for this.
+This package estimates the propensity score in the background and then matches observations based
+on the method of choice (“nearest” in this case)</p>
+<pre class="r"><code>High_Note_nomiss &lt;- High_Note %&gt;%  # MatchIt does not allow missing values
+  select(adopter, Treatment, one_of(High_Note_cov)) %&gt;%
+  na.omit()
+
+mod_match &lt;- matchit(Treatment ~ age + male + friend_cnt + avg_friend_age + avg_friend_male + friend_country_cnt +  
+                       ln_songsListened + ln_lovedTracks + posts + playlists + shouts + tenure + good_country,
+                     method = &quot;nearest&quot;, data = High_Note_nomiss)</code></pre>
+<pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<p>We can get some information about how successful the matching was using summary(mod_match) and plot(mod_match)</p>
+<pre class="r"><code>summary(mod_match)</code></pre>
+<pre><code>## 
+## Call:
+## matchit(formula = Treatment ~ age + male + friend_cnt + avg_friend_age + 
+##     avg_friend_male + friend_country_cnt + ln_songsListened + 
+##     ln_lovedTracks + posts + playlists + shouts + tenure + good_country, 
+##     data = High_Note_nomiss, method = &quot;nearest&quot;)
+## 
+## Summary of balance for all data:
+##                    Means Treated Means Control SD Control Mean Diff
+## distance                  0.4689        0.1532     0.1496    0.3157
+## age                      25.3732       23.7476     6.2245    1.6256
+## male                      0.6363        0.6288     0.4831    0.0074
+## friend_cnt               54.0210       10.4313    15.2769   43.5896
+## avg_friend_age           25.3904       23.7614     5.0577    1.6291
+## avg_friend_male           0.6358        0.6131     0.3343    0.0227
+## friend_country_cnt        9.3856        2.7251     3.1024    6.6606
+## ln_songsListened          9.6020        7.9441     2.7002    1.6579
+## ln_lovedTracks            3.9582        2.4466     1.9781    1.5116
+## posts                    20.5230        2.5434    33.7947   17.9796
+## playlists                 0.7441        0.5295     0.9673    0.2146
+## shouts                  101.8195       16.4230    79.7381   85.3965
+## tenure                   46.5487       43.2027    19.7212    3.3460
+## good_country              0.3433        0.3547     0.4784   -0.0114
+##                    eQQ Med eQQ Mean    eQQ Max
+## distance            0.2772   0.3157     0.6429
+## age                 1.0000   1.6296     5.0000
+## male                0.0000   0.0074     1.0000
+## friend_cnt         22.0000  43.5838  4794.0000
+## avg_friend_age      1.5909   1.6369    11.5000
+## avg_friend_male     0.0738   0.0958     0.3636
+## friend_country_cnt  5.0000   6.6598    95.0000
+## ln_songsListened    1.2880   1.6583     6.0283
+## ln_lovedTracks      1.5315   1.5115     2.8332
+## posts               0.0000  17.8829  9535.0000
+## playlists           0.0000   0.2092    26.0000
+## shouts             15.0000  85.1764 59168.0000
+## tenure              3.0000   3.3473    10.0000
+## good_country        0.0000   0.0114     1.0000
+## 
+## 
+## Summary of balance for matched data:
+##                    Means Treated Means Control SD Control Mean Diff
+## distance                  0.4689        0.3151     0.1854    0.1538
+## age                      25.3732       25.7794     7.5478   -0.4062
+## male                      0.6363        0.6585     0.4743   -0.0222
+## friend_cnt               54.0210       21.5264    23.3770   32.4946
+## avg_friend_age           25.3904       26.0051     6.4510   -0.6146
+## avg_friend_male           0.6358        0.6478     0.2587   -0.0120
+## friend_country_cnt        9.3856        5.0678     4.6172    4.3178
+## ln_songsListened          9.6020        9.4839     1.6281    0.1181
+## ln_lovedTracks            3.9582        3.7265     1.8645    0.2317
+## posts                    20.5230        6.2683    60.7389   14.2546
+## playlists                 0.7441        0.6678     0.9905    0.0762
+## shouts                  101.8195       36.7657   134.5236   65.0539
+## tenure                   46.5487       47.1905    19.1378   -0.6418
+## good_country              0.3433        0.3602     0.4801   -0.0169
+##                    eQQ Med eQQ Mean    eQQ Max
+## distance            0.1147   0.1538     0.4184
+## age                 0.0000   0.4599     6.0000
+## male                0.0000   0.0222     1.0000
+## friend_cnt         12.0000  32.4946  4794.0000
+## avg_friend_age      0.3333   0.8619    14.0000
+## avg_friend_male     0.0119   0.0258     0.1463
+## friend_country_cnt  2.0000   4.3178    95.0000
+## ln_songsListened    0.1447   0.1653     2.1972
+## ln_lovedTracks      0.3081   0.2664     0.8255
+## posts               0.0000  14.2546  9535.0000
+## playlists           0.0000   0.1194    95.0000
+## shouts              9.0000  65.0539 59168.0000
+## tenure              1.0000   0.9592     3.0000
+## good_country        0.0000   0.0169     1.0000
+## 
+## Percent Balance Improvement:
+##                    Mean Diff.  eQQ Med  eQQ Mean   eQQ Max
+## distance              51.2952  58.6333   51.2929   34.9201
+## age                   75.0137 100.0000   71.7766  -20.0000
+## male                -198.9313   0.0000 -198.6301    0.0000
+## friend_cnt            25.4535  45.4545   25.4436    0.0000
+## avg_friend_age        62.2701  79.0476   47.3451  -21.7391
+## avg_friend_male       47.2679  83.8776   73.0291   59.7722
+## friend_country_cnt    35.1733  60.0000   35.1656    0.0000
+## ln_songsListened      92.8737  88.7676   90.0310   63.5514
+## ln_lovedTracks        84.6695  79.8827   82.3770   70.8626
+## posts                 20.7178   0.0000   20.2893    0.0000
+## playlists             64.4694   0.0000   42.9197 -265.3846
+## shouts                23.8214  40.0000   23.6246    0.0000
+## tenure                80.8203  66.6667   71.3452   70.0000
+## good_country         -48.0096   0.0000  -48.2143    0.0000
+## 
+## Sample sizes:
+##           Control Treated
+## All         34004    9823
+## Matched      9823    9823
+## Unmatched   24181       0
+## Discarded       0       0</code></pre>
+<pre class="r"><code>plot(mod_match)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-1.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-2.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-3.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-4.png" width="672" /><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-13-5.png" width="672" /></p>
+<p>To create a dataframe containing only the matched observations, use the match.data() function</p>
+<pre class="r"><code>dta_m &lt;- match.data(mod_match)
+dim(dta_m)</code></pre>
+<pre><code>## [1] 19646    17</code></pre>
+<p>Examining covariate balance in the matched sample
+Visual Inspection</p>
+<pre class="r"><code>fn_bal &lt;- function(dta, variable) {
+  dta$variable &lt;- dta[, variable]
+  dta$Treatment &lt;- as.factor(dta$Treatment)
+  support &lt;- c(min(dta$variable), max(dta$variable))
+  ggplot(dta, aes(x = distance, y = variable, color = Treatment)) +
+    geom_point(alpha = 0.2, size = 1.3) +
+    geom_smooth(method = &quot;loess&quot;, se = F) +
+    xlab(&quot;Propensity score&quot;) +
+    ylab(variable) +
+    theme_bw() +
+    ylim(support)
+}
+
+grid.arrange(
+  fn_bal(dta_m, &quot;age&quot;),
+  fn_bal(dta_m, &quot;male&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;friend_cnt&quot;),
+  fn_bal(dta_m, &quot;avg_friend_age&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;friend_country_cnt&quot;),
+  fn_bal(dta_m, &quot;ln_songsListened&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;ln_lovedTracks&quot;),
+  fn_bal(dta_m, &quot;playlists&quot;) + theme(legend.position = &quot;none&quot;),
+  fn_bal(dta_m, &quot;tenure&quot;),
+  fn_bal(dta_m, &quot;good_country&quot;) + theme(legend.position = &quot;none&quot;),
+  nrow = 6, widths = c(1, 0.8)
+)</code></pre>
+<p><img src="/posts/Peer_Influence_files/figure-html/unnamed-chunk-15-1.png" width="672" />
+Difference of Means</p>
+<pre class="r"><code>dta_m %&gt;%
+  group_by(Treatment) %&gt;%
+  select(one_of(High_Note_cov)) %&gt;%
+  summarise_all(funs(mean))</code></pre>
+<pre><code>## Adding missing grouping variables: `Treatment`</code></pre>
+<pre><code>## # A tibble: 2 x 14
+##   Treatment   age  male friend_cnt avg_friend_age avg_friend_male
+##       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
+## 1         0  25.8 0.658       21.5           26.0           0.648
+## 2         1  25.4 0.636       54.0           25.4           0.636
+## # ... with 8 more variables: friend_country_cnt &lt;dbl&gt;,
+## #   ln_songsListened &lt;dbl&gt;, ln_lovedTracks &lt;dbl&gt;, posts &lt;dbl&gt;,
+## #   playlists &lt;dbl&gt;, shouts &lt;dbl&gt;, tenure &lt;dbl&gt;, good_country &lt;dbl&gt;</code></pre>
+<pre class="r"><code>lapply(High_Note_cov, function(v) {
+  t.test(dta_m[, v] ~ dta_m$Treatment)
+})</code></pre>
+<pre><code>## [[1]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 3.9186, df = 19521, p-value = 8.937e-05
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.2030131 0.6093660
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        25.77940        25.37321 
+## 
+## 
+## [[2]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 3.2559, df = 19640, p-value = 0.001132
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.008832644 0.035552982
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6584546       0.6362618 
+## 
+## 
+## [[3]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -24.769, df = 10477, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -35.06619 -29.92292
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        21.52642        54.02097 
+## 
+## 
+## [[4]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 7.3709, df = 18749, p-value = 1.765e-13
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.4511959 0.7780907
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        26.00507        25.39043 
+## 
+## 
+## [[5]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 3.428, df = 19374, p-value = 0.0006094
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.005124659 0.018810817
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6477754       0.6358077 
+## 
+## 
+## [[6]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -38.82, df = 13820, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -4.535843 -4.099808
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        5.067800        9.385626 
+## 
+## 
+## [[7]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -4.8926, df = 19535, p-value = 1.003e-06
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.1654825 -0.0708156
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        9.483885        9.602034 
+## 
+## 
+## [[8]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -8.294, df = 19474, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.2864991 -0.1769691
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        3.726452        3.958186 
+## 
+## 
+## [[9]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -5.6784, df = 11062, p-value = 1.394e-08
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -19.175269  -9.333944
+## sample estimates:
+## mean in group 0 mean in group 1 
+##         6.26835        20.52296 
+## 
+## 
+## [[10]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -3.4421, df = 14535, p-value = 0.0005789
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.11967088 -0.03282836
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.6678204       0.7440700 
+## 
+## 
+## [[11]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = -8.5779, df = 10471, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -79.91979 -50.18792
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        36.76565       101.81951 
+## 
+## 
+## [[12]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 2.3025, df = 19612, p-value = 0.02132
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.09544044 1.18807784
+## sample estimates:
+## mean in group 0 mean in group 1 
+##        47.19047        46.54871 
+## 
+## 
+## [[13]]
+## 
+##  Welch Two Sample t-test
+## 
+## data:  dta_m[, v] by dta_m$Treatment
+## t = 2.4805, df = 19642, p-value = 0.01313
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  0.003545363 0.030252866
+## sample estimates:
+## mean in group 0 mean in group 1 
+##       0.3601751       0.3432760</code></pre>
+<p>Estimating treatment effects</p>
+<p>Estimating the treatment effect is simple once we have
+a matched sample that we are happy with. We can use a t-test:</p>
+<pre class="r"><code>with(dta_m, t.test(adopter ~ Treatment))</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  adopter by Treatment
+## t = -16.725, df = 18453, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -0.09098592 -0.07189711
+## sample estimates:
+## mean in group 0 mean in group 1 
+##      0.09610099      0.17754250</code></pre>
+<p>Or we can use OLS with or without covariates:</p>
+<pre class="r"><code>glm_treat1 &lt;- glm(adopter ~ Treatment, data = dta_m, family = &quot;binomial&quot;)
+summary(glm_treat1)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = adopter ~ Treatment, family = &quot;binomial&quot;, data = dta_m)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6252  -0.6252  -0.4495  -0.4495   2.1644  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -2.24132    0.03423  -65.48   &lt;2e-16 ***
+## Treatment    0.70823    0.04323   16.38   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 15683  on 19645  degrees of freedom
+## Residual deviance: 15404  on 19644  degrees of freedom
+## AIC: 15408
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+<pre class="r"><code>glm_treat2 &lt;- glm(adopter ~ age + male + friend_cnt + avg_friend_age + avg_friend_male + friend_country_cnt +  
+                    ln_songsListened + ln_lovedTracks + posts + playlists + shouts + tenure + good_country + Treatment, 
+                  data = dta_m, family = &quot;binomial&quot;)
+summary(glm_treat2)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = adopter ~ age + male + friend_cnt + avg_friend_age + 
+##     avg_friend_male + friend_country_cnt + ln_songsListened + 
+##     ln_lovedTracks + posts + playlists + shouts + tenure + good_country + 
+##     Treatment, family = &quot;binomial&quot;, data = dta_m)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8606  -0.5791  -0.4414  -0.3078   3.0933  
+## 
+## Coefficients:
+##                      Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -6.432e+00  2.287e-01 -28.118  &lt; 2e-16 ***
+## age                 1.562e-02  4.257e-03   3.670 0.000243 ***
+## male                2.999e-01  4.886e-02   6.138 8.38e-10 ***
+## friend_cnt          2.092e-04  2.780e-04   0.752 0.451845    
+## avg_friend_age      2.881e-02  5.681e-03   5.071 3.96e-07 ***
+## avg_friend_male     9.103e-02  9.660e-02   0.942 0.346005    
+## friend_country_cnt -4.700e-03  3.701e-03  -1.270 0.204087    
+## ln_songsListened    2.035e-01  1.928e-02  10.554  &lt; 2e-16 ***
+## ln_lovedTracks      2.672e-01  1.342e-02  19.916  &lt; 2e-16 ***
+## posts               1.653e-04  9.384e-05   1.762 0.078131 .  
+## playlists           3.776e-02  1.315e-02   2.872 0.004084 ** 
+## shouts              9.645e-05  7.059e-05   1.366 0.171798    
+## tenure             -3.914e-03  1.262e-03  -3.101 0.001928 ** 
+## good_country       -3.986e-01  4.780e-02  -8.339  &lt; 2e-16 ***
+## Treatment           6.379e-01  4.628e-02  13.783  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 15683  on 19645  degrees of freedom
+## Residual deviance: 14366  on 19631  degrees of freedom
+## AIC: 14396
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<p>In a logistic regression the response being modeled is the log(odds) that Y = 1
+The regression coefficient gives the change in log(odds) in the response for a unit change in the predictor variable
+because log(odds) are difficult to interpret, we can exponentiate them</p>
+<p>We can see that the odds of being a premium subscriber are increased by a factor of 1.499 when and individual is male</p>
+<pre class="r"><code>exp(coef(glm_treat2))</code></pre>
+<pre><code>##        (Intercept)                age               male 
+##        0.001609923        1.015744376        1.349707685 
+##         friend_cnt     avg_friend_age    avg_friend_male 
+##        1.000209180        1.029229423        1.095303373 
+## friend_country_cnt   ln_songsListened     ln_lovedTracks 
+##        0.995310871        1.225697366        1.306303144 
+##              posts          playlists             shouts 
+##        1.000165322        1.038485243        1.000096459 
+##             tenure       good_country          Treatment 
+##        0.996093907        0.671239518        1.892417465</code></pre>
+</div>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Amazon Network Analysis</title>
+			<link>/posts/2019-03-13-amazon-network-analysis/</link>
+			<pubDate>Wed, 13 Mar 2019 21:13:14 -0500</pubDate>
+			
+			<guid>/posts/2019-03-13-amazon-network-analysis/</guid>
+			<description>Amazon Network Analysis# Load relevant packageslibrary(car)library(dplyr)library(tidyr)library(igraph)library(ggplot2)library(corrplot)head(products)## id title## 1 1 Patterns of Preaching: A Sermon Sampler## 2 2 Candlemas: Feast of Flames## 3 3 World War II Allied Fighter Planes Trading Cards## 4 4 Life Application Bible Commentary: 1 and 2 Timothy and Titus## 5 5 Prayers That Avail Much for Business: Executive## 6 6 How the Other Half Lives: Studies Among the Tenements of New York## group salesrank review_cnt downloads rating## 1 Book 396585 2 2 5.</description>
+			<content type="html"><![CDATA[
+
+
+<div id="amazon-network-analysis" class="section level2">
+<h2>Amazon Network Analysis</h2>
+<pre class="r"><code># Load relevant packages
+library(car)
+library(dplyr)
+library(tidyr)
+library(igraph)
+library(ggplot2)
+library(corrplot)</code></pre>
+<pre class="r"><code>head(products)</code></pre>
+<pre><code>##   id                                                             title
+## 1  1                           Patterns of Preaching: A Sermon Sampler
+## 2  2                                        Candlemas: Feast of Flames
+## 3  3                  World War II Allied Fighter Planes Trading Cards
+## 4  4      Life Application Bible Commentary: 1 and 2 Timothy and Titus
+## 5  5                   Prayers That Avail Much for Business: Executive
+## 6  6 How the Other Half Lives: Studies Among the Tenements of New York
+##   group salesrank review_cnt downloads rating
+## 1  Book    396585          2         2    5.0
+## 2  Book    168596         12        12    4.5
+## 3  Book   1270652          1         1    5.0
+## 4  Book    631289          1         1    4.0
+## 5  Book    455160          0         0    0.0
+## 6  Book    188784         17        17    4.0</code></pre>
+<pre class="r"><code>head(copurchase)</code></pre>
+<pre><code>##   Source Target
+## 1      1      2
+## 2      1      4
+## 3      1      5
+## 4      1     15
+## 5      2     11
+## 6      2     12</code></pre>
+<pre class="r"><code>#We are onluy interested in a subset of this dataset, we want to look for Books 
+books.products &lt;- filter(products, group == &quot;Book&quot; 
+                         &amp; salesrank &lt;= 150000 &amp; salesrank &gt;= 0)
+
+books.copurchase &lt;- filter(copurchase, Source %in% books.products$id
+                           &amp; Target %in% books.products$id)</code></pre>
+<pre class="r"><code>#We want to find the ID with the highest indegree (For a vertex, the number of head ends adjacent to a vertex is called the indegree of the vertex)
+indegree.df &lt;- summarize(group_by(books.copurchase, Target), indegree = n()) %&gt;% arrange(desc(indegree))
+names(indegree.df)[1]&lt;-&quot;id&quot;
+head(indegree.df)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##      id indegree
+##   &lt;int&gt;    &lt;int&gt;
+## 1  4429       46
+## 2    33       44
+## 3   244       35
+## 4   302       22
+## 5  5913       20
+## 6   626       16</code></pre>
+<pre class="r"><code>##We want to find the ID with the highest outdegree (the number of tail ends adjacent to a vertex is its outdegree)
+outdegree.df &lt;- summarize(group_by(books.copurchase, Source), outdegree = n()) %&gt;% arrange(desc(outdegree))
+names(outdegree.df)[1]&lt;-&quot;id&quot;
+head(outdegree.df)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##       id outdegree
+##    &lt;int&gt;     &lt;int&gt;
+## 1 126396         5
+## 2 151687         5
+## 3   4993         4
+## 4  26268         4
+## 5  28040         4
+## 6  29680         4</code></pre>
+<pre class="r"><code>books.graph &lt;- merge(books.products, indegree.df, by=&quot;id&quot;, all.x = TRUE)  #Merge the Dataframes
+books.graph &lt;- merge(books.graph, outdegree.df, by=&quot;id&quot;, all.x = TRUE)  #Merge the Dataframes
+books.graph$indegree[is.na(books.graph$indegree)] &lt;- 0     #ssign 0 to those who are na
+books.graph$outdegree[is.na(books.graph$outdegree)] &lt;- 0  #assign 0 to those who are na
+books.graph &lt;- mutate(books.graph, degree = indegree + outdegree) # sum indegree and outdegree to create degree
+head(books.graph)</code></pre>
+<pre><code>##   id
+## 1 12
+## 2 33
+## 3 39
+## 4 45
+## 5 74
+## 6 77
+##                                                                                                      title
+## 1 Fantastic Food with Splenda : 160 Great Recipes for Meals Low in Sugar, Carbohydrates, Fat, and Calories
+## 2                                                                           Double Jeopardy (T*Witches, 6)
+## 3                                                                           Night of Many Dreams : A Novel
+## 4                                                                     Beginning ASP.NET Databases using C#
+## 5                                                      Service Delivery (It Infrastructure Library Series)
+## 6                                                                                     Water Touching Stone
+##   group salesrank review_cnt downloads rating indegree outdegree degree
+## 1  Book     24741         12        12    4.5        5         1      6
+## 2  Book     97166          4         4    5.0       44         0     44
+## 3  Book     57186         22        22    3.5        4         0      4
+## 4  Book     48408          4         4    4.0        0         0      0
+## 5  Book     27507          2         2    4.0        1         1      2
+## 6  Book     27012         11        11    4.5        3         1      4</code></pre>
+<pre class="r"><code>#We are looking for the book with highest degree
+filter(books.graph, degree == max(books.graph$degree))</code></pre>
+<pre><code>##     id                                    title group salesrank review_cnt
+## 1 4429 Harley-Davidson Panheads, 1948-1965/M418  Book    147799          3
+##   downloads rating indegree outdegree degree
+## 1         3    4.5       46         1     47</code></pre>
+<pre class="r"><code>g &lt;- graph_from_data_frame(books.copurchase, directed = TRUE)    #we creathe a directed graph
+sg &lt;- induced_subgraph(g, subcomponent(g, &quot;4429&quot;, &quot;all&quot;), impl = &quot;auto&quot;)  #we are only interested in id &quot;4429&quot;
+sg &lt;- simplify(sg, remove.multiple = F, remove.loops = T)
+V(sg)</code></pre>
+<pre><code>## + 756/756 vertices, named, from 2bed862:
+##   [1] 77     130    148    187    193    224    321    322    422    556   
+##  [11] 577    626    724    1051   1644   1817   1822   1851   1971   2071  
+##  [21] 2210   2279   2285   2326   2330   2332   2343   2423   2470   2501  
+##  [31] 2505   2558   2572   2657   2658   2806   2807   2959   3032   3119  
+##  [41] 3191   3217   3306   3588   3670   3737   3861   3909   4002   4014  
+##  [51] 4068   4099   4140   4174   4184   4185   4222   4223   4345   4429  
+##  [61] 4977   4993   4994   5018   5163   5164   5293   5355   5388   5623  
+##  [71] 5638   5639   5655   5670   5821   5851   5875   6012   6014   6392  
+##  [81] 6411   6445   6546   6711   6713   6817   6942   7196   7198   7222  
+##  [91] 7233   7325   7376   7406   7544   7743   7754   7775   7839   7841  
+## + ... omitted several vertices</code></pre>
+<pre class="r"><code>E(sg)</code></pre>
+<pre><code>## + 986/986 edges from 2bed862 (vertex names):
+##  [1] 77  -&gt;422  130 -&gt;78   148 -&gt;302  187 -&gt;321  187 -&gt;322  187 -&gt;78  
+##  [7] 193 -&gt;224  224 -&gt;193  224 -&gt;33   321 -&gt;187  321 -&gt;322  321 -&gt;78  
+## [13] 322 -&gt;187  322 -&gt;321  322 -&gt;78   422 -&gt;77   422 -&gt;1644 556 -&gt;78  
+## [19] 577 -&gt;33   626 -&gt;33   724 -&gt;302  1051-&gt;302  1644-&gt;422  1644-&gt;5293
+## [25] 1817-&gt;976  1822-&gt;193  1822-&gt;724  1851-&gt;78   1971-&gt;193  2071-&gt;3155
+## [31] 2210-&gt;2279 2210-&gt;2285 2279-&gt;2210 2279-&gt;2326 2285-&gt;2330 2326-&gt;193 
+## [37] 2326-&gt;2210 2330-&gt;2343 2330-&gt;2345 2332-&gt;4140 2343-&gt;2285 2343-&gt;2330
+## [43] 2423-&gt;5410 2470-&gt;556  2501-&gt;3588 2505-&gt;2501 2558-&gt;33   2572-&gt;4184
+## [49] 2572-&gt;4185 2657-&gt;2658 2658-&gt;77   2806-&gt;2807 2807-&gt;302  2959-&gt;1673
+## [55] 3032-&gt;2558 3119-&gt;976  3191-&gt;2279 3217-&gt;4319 3306-&gt;2071 3306-&gt;4345
+## + ... omitted several edges</code></pre>
+<pre class="r"><code>diameter &lt;- get_diameter(sg)
+diameter</code></pre>
+<pre><code>## + 10/756 vertices, named, from 2bed862:
+##  [1] 37895 27936 21584 10889 11080 14111 4429  2501  3588  6676</code></pre>
+<pre class="r"><code>#Plot the graph for id &quot;4429&quot;
+
+V(sg)$color &lt;- ifelse(V(sg)$name %in% diameter$name, &quot;red&quot;, &quot;lightblue&quot;)
+V(sg)[&quot;4429&quot;]$color &lt;- &quot;green&quot;
+V(sg)[&quot;33&quot;]$color &lt;- &quot;gold&quot;
+E(sg)$color &lt;- &quot;darkgray&quot;
+E(sg,path=diameter)$color &lt;- &quot;red&quot;
+E(sg)$width &lt;- 1
+E(sg,path=diameter)$width &lt;- 3
+options(repr.plot.width = 100, repr.plot.height = 100)
+plot(sg, layout=layout_with_fr, vertex.size=1, vertex.label=NA, edge.arrow.size=0.05)</code></pre>
+<p><img src="/posts/2019-03-13-Amazon-Network-Analysis_files/figure-html/fig1-1.png" width="1440" style="display: block; margin: auto;" /></p>
+</div>
+]]></content>
+		</item>
+		
+		<item>
+			<title>The &#34;figure&#34; Shortcode</title>
+			<link>/posts/the-figure-shortcode/</link>
+			<pubDate>Mon, 24 Dec 2018 12:29:41 +0800</pubDate>
+			
+			<guid>/posts/the-figure-shortcode/</guid>
+			<description>Hugo has figure shortcode built in, so you can easily add figcaptions or hyperlink rel attributes to images. Documentations can be found here:
+https://gohugo.io/content-management/shortcodes/#figure
+This theme has 3 CSS classes made for figure elements:
+ big: images will break the width limit of main content area. left: images will float to the left. right: images will float to the right.  If a figure has no class set, the image will behave just like a normal markdown image: !</description>
+			<content type="html"><![CDATA[<p>Hugo has <code>figure</code> shortcode built in, so you can easily add figcaptions or hyperlink rel attributes to images. Documentations can be found here:</p>
+
+<p><a href="https://gohugo.io/content-management/shortcodes/#figure">https://gohugo.io/content-management/shortcodes/#figure</a></p>
+
+<p>This theme has 3 CSS classes made for figure elements:</p>
+
+<ul>
+<li><code>big</code>: images will break the width limit of main content area.</li>
+<li><code>left</code>: images will float to the left.</li>
+<li><code>right</code>: images will float to the right.</li>
+</ul>
+
+<p>If a figure has no class set, the image will behave just like a normal markdown image: <code>![]()</code>.</p>
+
+<p>Here&rsquo;s some examples, please be aware that these styles only take effect when the page width is over 1300px.</p>
+
+<figure>
+    <img src="https://via.placeholder.com/1600x800"
+         alt="image"/> <figcaption>
+            <p>figure-normal (without any classes)</p>
+        </figcaption>
+</figure>
+
+
+<p>Pellentesque posuere sem nec nunc varius, id hendrerit arcu consequat. Maecenas commodo, sapien ut gravida porttitor, dolor risus facilisis enim, eget pharetra nibh nisl porttitor sapien. Proin finibus elementum ligula sit amet hendrerit. Praesent et erat sodales ante accumsan pharetra non eu nulla. Sed vehicula consequat lorem, a fermentum ante faucibus quis. Aliquam erat volutpat. In vitae tincidunt dui. Proin sit amet ligula sodales, elementum tortor et, venenatis sem. Maecenas non nisl erat. Curabitur nec velit eros. Ut cursus lacus nisi, non pretium libero euismod et. Fusce luctus in nisi quis sollicitudin. Aenean nec blandit ligula. Duis ac felis lorem. Proin tellus tellus, dictum nec tempus sit amet, venenatis ac felis. Sed in pharetra nulla, non mollis sem.</p>
+
+<figure class="big">
+    <img src="https://via.placeholder.com/1600x800"
+         alt="image"/> <figcaption>
+            <p>figure-big</p>
+        </figcaption>
+</figure>
+
+
+<p>Suspendisse fringilla malesuada massa, in malesuada orci lacinia a. Praesent dapibus faucibus nisl, id volutpat elit bibendum eu. Nulla vitae laoreet nibh, eu hendrerit lacus. Donec lacinia auctor ligula, vel interdum ipsum malesuada vitae. Donec placerat a justo eu gravida. Aenean ultricies imperdiet convallis. Pellentesque accumsan non ex sed euismod. Proin bibendum lectus nec enim faucibus feugiat. Donec hendrerit nisi viverra ornare luctus. Nullam non viverra nisl. Nam vel tellus et tortor elementum volutpat sit amet et erat. Aliquam a libero quis libero porta consectetur. Etiam aliquam felis vel nulla mattis finibus. Mauris laoreet lacus arcu, sed rhoncus odio condimentum sed. Aenean in dui rutrum elit faucibus faucibus nec fringilla augue. Fusce non ornare mauris.</p>
+
+<figure class="left">
+    <img src="https://via.placeholder.com/400x280"
+         alt="image"/> <figcaption>
+            <p>figure-left</p>
+        </figcaption>
+</figure>
+
+
+<p>In a libero varius, luctus ligula et, bibendum tortor. Sed sit amet dui malesuada, mattis justo id, ultricies enim. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam sollicitudin cursus feugiat. Vivamus suscipit ipsum eget lobortis sollicitudin. Fusce vehicula neque tellus. Integer eu posuere quam, id laoreet tortor. Mauris sit amet turpis urna. Donec venenatis tempor dolor, nec laoreet orci aliquet et. Sed condimentum elit eu tristique aliquam. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nunc luctus ipsum sit amet nisl maximus pellentesque.</p>
+
+<figure class="right">
+    <img src="https://via.placeholder.com/400x280"
+         alt="image"/> <figcaption>
+            <p>figure-right</p>
+        </figcaption>
+</figure>
+
+
+<p>Pellentesque eu consequat nunc. Vivamus eu eros ut nulla dapibus molestie in id tortor. Cras viverra ligula erat, tincidunt hendrerit diam blandit nec. Cras id urna vel dolor dictum mattis. Vestibulum congue erat ac eros molestie accumsan. Maecenas lorem nibh, maximus vel justo eget, facilisis egestas lectus. Mauris eu est ut odio blandit consequat id feugiat eros. Fusce id suscipit mi, et lacinia lectus. Mauris a arcu placerat dolor iaculis feugiat nec non mi. Ut porttitor elit tortor, eget tempus velit mollis eu. Aliquam sem nulla, dictum cursus mauris ac, semper ullamcorper leo.</p>
+
+<p>Donec nec tincidunt est. Sed id metus in erat fringilla mattis at id turpis. Aliquam tempor vehicula faucibus. Phasellus consequat aliquam odio. Morbi a ex vitae sapien porta auctor. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec sit amet nulla arcu. Praesent ut tortor purus. Praesent id eros diam. Pellentesque vitae dolor at nibh ultrices accumsan eu id urna. Aliquam finibus interdum orci in varius. Pellentesque a enim condimentum, condimentum felis id, vehicula augue. Vivamus cursus commodo eros nec lacinia.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Post With Featured Image</title>
+			<link>/posts/post-with-featured-image/</link>
+			<pubDate>Mon, 01 Oct 2018 16:15:09 +0800</pubDate>
+			
+			<guid>/posts/post-with-featured-image/</guid>
+			<description>Just define the image URL in the content’s front matter, the featured image will be displayed as the background.
+For example:
+---images:-https://picsum.photos/1024/768/?random--- This is an array, you can set multiple urls, only the first url will be used. These images is also used in Twitter Cards and the Open Graph metadata.</description>
+			<content type="html"><![CDATA[<p>Just define the image URL in the content’s front matter, the featured image will be displayed as the background.</p>
+
+<p>For example:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">---<span class="w">
+</span><span class="w"></span>images<span class="p">:</span><span class="w">
+</span><span class="w">  </span>-<span class="w"> </span>https<span class="p">:</span>//picsum.photos/<span class="m">1024</span>/<span class="m">768</span>/<span class="p">?</span>random<span class="w">
+</span><span class="w"></span>---</code></pre></div>
+<p>This is an array, you can set multiple urls, only the first url will be used. These images is also used in <a href="https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started.html">Twitter Cards</a> and the <a href="http://ogp.me/">Open Graph</a> metadata.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Typography</title>
+			<link>/posts/typography/</link>
+			<pubDate>Sat, 29 Sep 2018 11:36:33 +0800</pubDate>
+			
+			<guid>/posts/typography/</guid>
+			<description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
+			<content type="html"><![CDATA[
+
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<blockquote>
+<p>An apple is a sweet, edible fruit produced by an apple tree (Malus pumila). Apple trees are cultivated worldwide, and are the most widely grown species in the genus Malus. The tree originated in Central Asia, where its wild ancestor, Malus sieversii, is still found today. Apples have been grown for thousands of years in Asia and Europe, and were brought to North America by European colonists. Apples have religious and mythological significance in many cultures, including Norse, Greek and European Christian traditions.<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup></p>
+</blockquote>
+
+<hr />
+
+<p>Inline styles：</p>
+
+<p><strong>strong</strong>, <em>emphasis</em>, <strong><em>strong and emphasis</em></strong>,<code>code</code>, <u>underline</u>, <del>strikethrough</del>, 😂🤣, $\LaTeX$, X^2^, H~2~O, ==highlight==, <a href="https://example.com">Link</a>, and image:</p>
+
+<p><img src="https://picsum.photos/600/400/?random" alt="img" /></p>
+
+<hr />
+
+<p>Headings:</p>
+
+<h1 id="heading-1">Heading 1</h1>
+
+<h2 id="heading-2">Heading 2</h2>
+
+<h3 id="heading-3">Heading 3</h3>
+
+<h4 id="heading-4">Heading 4</h4>
+
+<h5 id="heading-5">Heading 5</h5>
+
+<h6 id="heading-6">Heading 6</h6>
+
+<p>Table:</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Left-Aligned</th>
+<th align="center">Center Aligned</th>
+<th align="right">Right Aligned</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="left">col 3 is</td>
+<td align="center">some wordy text</td>
+<td align="right">$1600</td>
+</tr>
+
+<tr>
+<td align="left">col 2 is</td>
+<td align="center">centered</td>
+<td align="right">$12</td>
+</tr>
+
+<tr>
+<td align="left">zebra stripes</td>
+<td align="center">are neat</td>
+<td align="right">$1</td>
+</tr>
+</tbody>
+</table>
+
+<p>Lists:</p>
+
+<ul>
+<li>Unordered list item 1.</li>
+<li>Unordered list item 2.</li>
+</ul>
+
+<ol class="task-list">
+<li>ordered list item 1.</li>
+<li>ordered list item 2.
+
+<ul class="task-list">
+<li>sub-unordered list item 1.</li>
+<li>sub-unordered list item 2.
+
+<ul class="task-list">
+<li><label><input type="checkbox" checked disabled class="task-list-item"> something is DONE.</label></li>
+<li><label><input type="checkbox" disabled class="task-list-item"> something is NOT DONE.</label></li>
+</ul></li>
+</ul></li>
+</ol>
+
+<p>Syntax Highlighting:</p>
+<div class="highlight"><pre class="chroma"><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">num1</span><span class="p">,</span> <span class="nx">num2</span><span class="p">,</span> <span class="nx">sum</span>
+<span class="nx">num1</span> <span class="o">=</span> <span class="nx">prompt</span><span class="p">(</span><span class="s2">&#34;Enter first number&#34;</span><span class="p">)</span>
+<span class="nx">num2</span> <span class="o">=</span> <span class="nx">prompt</span><span class="p">(</span><span class="s2">&#34;Enter second number&#34;</span><span class="p">)</span>
+<span class="nx">sum</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">num1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">num2</span><span class="p">)</span> <span class="c1">// &#34;+&#34; means &#34;add&#34;
+</span><span class="c1"></span><span class="nx">alert</span><span class="p">(</span><span class="s2">&#34;Sum = &#34;</span> <span class="o">+</span> <span class="nx">sum</span><span class="p">)</span>  <span class="c1">// &#34;+&#34; means combine into a string
+</span></code></pre></div><div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:1">From <a href="https://en.wikipedia.org/wiki/Apple">https://en.wikipedia.org/wiki/Apple</a>
+ <a class="footnote-return" href="#fnref:1"><sup>[return]</sup></a></li>
+</ol>
+</div>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Hello R Markdown</title>
+			<link>/posts/2015-07-23-r-rmarkdown/</link>
+			<pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+			
+			<guid>/posts/2015-07-23-r-rmarkdown/</guid>
+			<description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
+You can embed an R code chunk like this:
+summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+			<content type="html"><![CDATA[
+
+
+<div id="r-markdown" class="section level1">
+<h1>R Markdown</h1>
+<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
+<p>You can embed an R code chunk like this:</p>
+<pre class="r"><code>summary(cars)
+##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00
+fit &lt;- lm(dist ~ speed, data = cars)
+fit
+## 
+## Call:
+## lm(formula = dist ~ speed, data = cars)
+## 
+## Coefficients:
+## (Intercept)        speed  
+##     -17.579        3.932</code></pre>
+</div>
+<div id="including-plots" class="section level1">
+<h1>Including Plots</h1>
+<p>You can also embed plots. See Figure <a href="#fig:pie">1</a> for example:</p>
+<pre class="r"><code>par(mar = c(0, 1, 0, 1))
+pie(
+  c(280, 60, 20),
+  c(&#39;Sky&#39;, &#39;Sunny side of pyramid&#39;, &#39;Shady side of pyramid&#39;),
+  col = c(&#39;#0292D8&#39;, &#39;#F7EA39&#39;, &#39;#C4B632&#39;),
+  init.angle = -50, border = NA
+)</code></pre>
+<div class="figure"><span id="fig:pie"></span>
+<img src="/posts/2015-07-23-r-rmarkdown_files/figure-html/pie-1.png" alt="A fancy pie chart." width="672" />
+<p class="caption">
+Figure 1: A fancy pie chart.
+</p>
+</div>
+</div>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Creating a New Theme</title>
+			<link>/posts/creating-a-new-theme/</link>
+			<pubDate>Sun, 28 Sep 2014 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/creating-a-new-theme/</guid>
+			<description>Introduction This tutorial will show you how to create a simple theme in Hugo. I assume that you are familiar with HTML, the bash command line, and that you are comfortable using Markdown to format content. I&amp;rsquo;ll explain how Hugo uses templates and how you can organize your templates to create a theme. I won&amp;rsquo;t cover using CSS to style your theme.
+We&amp;rsquo;ll start with creating a new site with a very basic template.</description>
+			<content type="html"><![CDATA[
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This tutorial will show you how to create a simple theme in Hugo. I assume that you are familiar with HTML, the bash command line, and that you are comfortable using Markdown to format content. I&rsquo;ll explain how Hugo uses templates and how you can organize your templates to create a theme. I won&rsquo;t cover using CSS to style your theme.</p>
+
+<p>We&rsquo;ll start with creating a new site with a very basic template. Then we&rsquo;ll add in a few pages and posts. With small variations on that, you will be able to create many different types of web sites.</p>
+
+<p>In this tutorial, commands that you enter will start with the &ldquo;$&rdquo; prompt. The output will follow. Lines that start with &ldquo;#&rdquo; are comments that I&rsquo;ve added to explain a point. When I show updates to a file, the &ldquo;:wq&rdquo; on the last line means to save the file.</p>
+
+<p>Here&rsquo;s an example:</p>
+
+<pre><code>## this is a comment
+$ echo this is a command
+this is a command
+
+## edit the file
+$ vi foo.md
++++
+date = &quot;2014-09-28&quot;
+title = &quot;creating a new theme&quot;
++++
+
+bah and humbug
+:wq
+
+## show it
+$ cat foo.md
++++
+date = &quot;2014-09-28&quot;
+title = &quot;creating a new theme&quot;
++++
+
+bah and humbug
+$
+</code></pre>
+
+<h2 id="some-definitions">Some Definitions</h2>
+
+<p>There are a few concepts that you need to understand before creating a theme.</p>
+
+<h3 id="skins">Skins</h3>
+
+<p>Skins are the files responsible for the look and feel of your site. It’s the CSS that controls colors and fonts, it’s the Javascript that determines actions and reactions. It’s also the rules that Hugo uses to transform your content into the HTML that the site will serve to visitors.</p>
+
+<p>You have two ways to create a skin. The simplest way is to create it in the <code>layouts/</code> directory. If you do, then you don’t have to worry about configuring Hugo to recognize it. The first place that Hugo will look for rules and files is in the <code>layouts/</code> directory so it will always find the skin.</p>
+
+<p>Your second choice is to create it in a sub-directory of the <code>themes/</code> directory. If you do, then you must always tell Hugo where to search for the skin. It’s extra work, though, so why bother with it?</p>
+
+<p>The difference between creating a skin in <code>layouts/</code> and creating it in <code>themes/</code> is very subtle. A skin in <code>layouts/</code> can’t be customized without updating the templates and static files that it is built from. A skin created in <code>themes/</code>, on the other hand, can be and that makes it easier for other people to use it.</p>
+
+<p>The rest of this tutorial will call a skin created in the <code>themes/</code> directory a theme.</p>
+
+<p>Note that you can use this tutorial to create a skin in the <code>layouts/</code> directory if you wish to. The main difference will be that you won’t need to update the site’s configuration file to use a theme.</p>
+
+<h3 id="the-home-page">The Home Page</h3>
+
+<p>The home page, or landing page, is the first page that many visitors to a site see. It is the index.html file in the root directory of the web site. Since Hugo writes files to the public/ directory, our home page is public/index.html.</p>
+
+<h3 id="site-configuration-file">Site Configuration File</h3>
+
+<p>When Hugo runs, it looks for a configuration file that contains settings that override default values for the entire site. The file can use TOML, YAML, or JSON. I prefer to use TOML for my configuration files. If you prefer to use JSON or YAML, you’ll need to translate my examples. You’ll also need to change the name of the file since Hugo uses the extension to determine how to process it.</p>
+
+<p>Hugo translates Markdown files into HTML. By default, Hugo expects to find Markdown files in your <code>content/</code> directory and template files in your <code>themes/</code> directory. It will create HTML files in your <code>public/</code> directory. You can change this by specifying alternate locations in the configuration file.</p>
+
+<h3 id="content">Content</h3>
+
+<p>Content is stored in text files that contain two sections. The first section is the “front matter,” which is the meta-information on the content. The second section contains Markdown that will be converted to HTML.</p>
+
+<h4 id="front-matter">Front Matter</h4>
+
+<p>The front matter is information about the content. Like the configuration file, it can be written in TOML, YAML, or JSON. Unlike the configuration file, Hugo doesn’t use the file’s extension to know the format. It looks for markers to signal the type. TOML is surrounded by “<code>+++</code>”, YAML by “<code>---</code>”, and JSON is enclosed in curly braces. I prefer to use TOML, so you’ll need to translate my examples if you prefer YAML or JSON.</p>
+
+<p>The information in the front matter is passed into the template before the content is rendered into HTML.</p>
+
+<h4 id="markdown">Markdown</h4>
+
+<p>Content is written in Markdown which makes it easier to create the content. Hugo runs the content through a Markdown engine to create the HTML which will be written to the output file.</p>
+
+<h3 id="template-files">Template Files</h3>
+
+<p>Hugo uses template files to render content into HTML. Template files are a bridge between the content and presentation. Rules in the template define what content is published, where it&rsquo;s published to, and how it will rendered to the HTML file. The template guides the presentation by specifying the style to use.</p>
+
+<p>There are three types of templates: single, list, and partial. Each type takes a bit of content as input and transforms it based on the commands in the template.</p>
+
+<p>Hugo uses its knowledge of the content to find the template file used to render the content. If it can’t find a template that is an exact match for the content, it will shift up a level and search from there. It will continue to do so until it finds a matching template or runs out of templates to try. If it can’t find a template, it will use the default template for the site.</p>
+
+<p>Please note that you can use the front matter to influence Hugo’s choice of templates.</p>
+
+<h4 id="single-template">Single Template</h4>
+
+<p>A single template is used to render a single piece of content. For example, an article or post would be a single piece of content and use a single template.</p>
+
+<h4 id="list-template">List Template</h4>
+
+<p>A list template renders a group of related content. That could be a summary of recent postings or all articles in a category. List templates can contain multiple groups.</p>
+
+<p>The homepage template is a special type of list template. Hugo assumes that the home page of your site will act as the portal for the rest of the content in the site.</p>
+
+<h4 id="partial-template">Partial Template</h4>
+
+<p>A partial template is a template that can be included in other templates. Partial templates must be called using the “partial” template command. They are very handy for rolling up common behavior. For example, your site may have a banner that all pages use. Instead of copying the text of the banner into every single and list template, you could create a partial with the banner in it. That way if you decide to change the banner, you only have to change the partial template.</p>
+
+<h2 id="create-a-new-site">Create a New Site</h2>
+
+<p>Let&rsquo;s use Hugo to create a new web site. I&rsquo;m a Mac user, so I&rsquo;ll create mine in my home directory, in the Sites folder. If you&rsquo;re using Linux, you might have to create the folder first.</p>
+
+<p>The &ldquo;new site&rdquo; command will create a skeleton of a site. It will give you the basic directory structure and a useable configuration file.</p>
+
+<pre><code>$ hugo new site ~/Sites/zafta
+$ cd ~/Sites/zafta
+$ ls -l
+total 8
+drwxr-xr-x  7 quoha  staff  238 Sep 29 16:49 .
+drwxr-xr-x  3 quoha  staff  102 Sep 29 16:49 ..
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 archetypes
+-rw-r--r--  1 quoha  staff   82 Sep 29 16:49 config.toml
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 content
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 layouts
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 static
+$
+</code></pre>
+
+<p>Take a look in the content/ directory to confirm that it is empty.</p>
+
+<p>The other directories (archetypes/, layouts/, and static/) are used when customizing a theme. That&rsquo;s a topic for a different tutorial, so please ignore them for now.</p>
+
+<h3 id="generate-the-html-for-the-new-site">Generate the HTML For the New Site</h3>
+
+<p>Running the <code>hugo</code> command with no options will read all the available content and generate the HTML files. It will also copy all static files (that&rsquo;s everything that&rsquo;s not content). Since we have an empty site, it won&rsquo;t do much, but it will do it very quickly.</p>
+
+<pre><code>$ hugo --verbose
+INFO: 2014/09/29 Using config file: config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+WARN: 2014/09/29 Unable to locate layout: [index.html _default/list.html _default/single.html]
+WARN: 2014/09/29 Unable to locate layout: [404.html]
+0 draft content 
+0 future content 
+0 pages created 
+0 tags created
+0 categories created
+in 2 ms
+$ 
+</code></pre>
+
+<p>The &ldquo;<code>--verbose</code>&rdquo; flag gives extra information that will be helpful when we build the template. Every line of the output that starts with &ldquo;INFO:&rdquo; or &ldquo;WARN:&rdquo; is present because we used that flag. The lines that start with &ldquo;WARN:&rdquo; are warning messages. We&rsquo;ll go over them later.</p>
+
+<p>We can verify that the command worked by looking at the directory again.</p>
+
+<pre><code>$ ls -l
+total 8
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 archetypes
+-rw-r--r--  1 quoha  staff   82 Sep 29 16:49 config.toml
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 content
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 layouts
+drwxr-xr-x  4 quoha  staff  136 Sep 29 17:02 public
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 static
+$
+</code></pre>
+
+<p>See that new public/ directory? Hugo placed all generated content there. When you&rsquo;re ready to publish your web site, that&rsquo;s the place to start. For now, though, let&rsquo;s just confirm that we have what we&rsquo;d expect from a site with no content.</p>
+
+<pre><code>$ ls -l public
+total 16
+-rw-r--r--  1 quoha  staff  416 Sep 29 17:02 index.xml
+-rw-r--r--  1 quoha  staff  262 Sep 29 17:02 sitemap.xml
+$ 
+</code></pre>
+
+<p>Hugo created two XML files, which is standard, but there are no HTML files.</p>
+
+<h3 id="test-the-new-site">Test the New Site</h3>
+
+<p>Verify that you can run the built-in web server. It will dramatically shorten your development cycle if you do. Start it by running the &ldquo;server&rdquo; command. If it is successful, you will see output similar to the following:</p>
+
+<pre><code>$ hugo server --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+WARN: 2014/09/29 Unable to locate layout: [index.html _default/list.html _default/single.html]
+WARN: 2014/09/29 Unable to locate layout: [404.html]
+0 draft content 
+0 future content 
+0 pages created 
+0 tags created
+0 categories created
+in 2 ms
+Serving pages from /Users/quoha/Sites/zafta/public
+Web Server is available at http://localhost:1313
+Press Ctrl+C to stop
+</code></pre>
+
+<p>Connect to the listed URL (it&rsquo;s on the line that starts with &ldquo;Web Server&rdquo;). If everything is working correctly, you should get a page that shows the following:</p>
+
+<pre><code>index.xml
+sitemap.xml
+</code></pre>
+
+<p>That&rsquo;s a listing of your public/ directory. Hugo didn&rsquo;t create a home page because our site has no content. When there&rsquo;s no index.html file in a directory, the server lists the files in the directory, which is what you should see in your browser.</p>
+
+<p>Let’s go back and look at those warnings again.</p>
+
+<pre><code>WARN: 2014/09/29 Unable to locate layout: [index.html _default/list.html _default/single.html]
+WARN: 2014/09/29 Unable to locate layout: [404.html]
+</code></pre>
+
+<p>That second warning is easier to explain. We haven’t created a template to be used to generate “page not found errors.” The 404 message is a topic for a separate tutorial.</p>
+
+<p>Now for the first warning. It is for the home page. You can tell because the first layout that it looked for was “index.html.” That’s only used by the home page.</p>
+
+<p>I like that the verbose flag causes Hugo to list the files that it&rsquo;s searching for. For the home page, they are index.html, _default/list.html, and _default/single.html. There are some rules that we&rsquo;ll cover later that explain the names and paths. For now, just remember that Hugo couldn&rsquo;t find a template for the home page and it told you so.</p>
+
+<p>At this point, you&rsquo;ve got a working installation and site that we can build upon. All that’s left is to add some content and a theme to display it.</p>
+
+<h2 id="create-a-new-theme">Create a New Theme</h2>
+
+<p>Hugo doesn&rsquo;t ship with a default theme. There are a few available (I counted a dozen when I first installed Hugo) and Hugo comes with a command to create new themes.</p>
+
+<p>We&rsquo;re going to create a new theme called &ldquo;zafta.&rdquo; Since the goal of this tutorial is to show you how to fill out the files to pull in your content, the theme will not contain any CSS. In other words, ugly but functional.</p>
+
+<p>All themes have opinions on content and layout. For example, Zafta uses &ldquo;post&rdquo; over &ldquo;blog&rdquo;. Strong opinions make for simpler templates but differing opinions make it tougher to use themes. When you build a theme, consider using the terms that other themes do.</p>
+
+<h3 id="create-a-skeleton">Create a Skeleton</h3>
+
+<p>Use the hugo &ldquo;new&rdquo; command to create the skeleton of a theme. This creates the directory structure and places empty files for you to fill out.</p>
+
+<pre><code>$ hugo new theme zafta
+
+$ ls -l
+total 8
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 archetypes
+-rw-r--r--  1 quoha  staff   82 Sep 29 16:49 config.toml
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 content
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 layouts
+drwxr-xr-x  4 quoha  staff  136 Sep 29 17:02 public
+drwxr-xr-x  2 quoha  staff   68 Sep 29 16:49 static
+drwxr-xr-x  3 quoha  staff  102 Sep 29 17:31 themes
+
+$ find themes -type f | xargs ls -l
+-rw-r--r--  1 quoha  staff  1081 Sep 29 17:31 themes/zafta/LICENSE.md
+-rw-r--r--  1 quoha  staff     0 Sep 29 17:31 themes/zafta/archetypes/default.md
+-rw-r--r--  1 quoha  staff     0 Sep 29 17:31 themes/zafta/layouts/_default/list.html
+-rw-r--r--  1 quoha  staff     0 Sep 29 17:31 themes/zafta/layouts/_default/single.html
+-rw-r--r--  1 quoha  staff     0 Sep 29 17:31 themes/zafta/layouts/index.html
+-rw-r--r--  1 quoha  staff     0 Sep 29 17:31 themes/zafta/layouts/partials/footer.html
+-rw-r--r--  1 quoha  staff     0 Sep 29 17:31 themes/zafta/layouts/partials/header.html
+-rw-r--r--  1 quoha  staff    93 Sep 29 17:31 themes/zafta/theme.toml
+$ 
+</code></pre>
+
+<p>The skeleton includes templates (the files ending in .html), license file, a description of your theme (the theme.toml file), and an empty archetype.</p>
+
+<p>Please take a minute to fill out the theme.toml and LICENSE.md files. They&rsquo;re optional, but if you&rsquo;re going to be distributing your theme, it tells the world who to praise (or blame). It&rsquo;s also nice to declare the license so that people will know how they can use the theme.</p>
+
+<pre><code>$ vi themes/zafta/theme.toml
+author = &quot;michael d henderson&quot;
+description = &quot;a minimal working template&quot;
+license = &quot;MIT&quot;
+name = &quot;zafta&quot;
+source_repo = &quot;&quot;
+tags = [&quot;tags&quot;, &quot;categories&quot;]
+:wq
+
+## also edit themes/zafta/LICENSE.md and change
+## the bit that says &quot;YOUR_NAME_HERE&quot;
+</code></pre>
+
+<p>Note that the the skeleton&rsquo;s template files are empty. Don&rsquo;t worry, we&rsquo;ll be changing that shortly.</p>
+
+<pre><code>$ find themes/zafta -name '*.html' | xargs ls -l
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 themes/zafta/layouts/_default/list.html
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 themes/zafta/layouts/_default/single.html
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 themes/zafta/layouts/index.html
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 themes/zafta/layouts/partials/footer.html
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 themes/zafta/layouts/partials/header.html
+$
+</code></pre>
+
+<h3 id="update-the-configuration-file-to-use-the-theme">Update the Configuration File to Use the Theme</h3>
+
+<p>Now that we&rsquo;ve got a theme to work with, it&rsquo;s a good idea to add the theme name to the configuration file. This is optional, because you can always add &ldquo;-t zafta&rdquo; on all your commands. I like to put it the configuration file because I like shorter command lines. If you don&rsquo;t put it in the configuration file or specify it on the command line, you won&rsquo;t use the template that you&rsquo;re expecting to.</p>
+
+<p>Edit the file to add the theme, add a title for the site, and specify that all of our content will use the TOML format.</p>
+
+<pre><code>$ vi config.toml
+theme = &quot;zafta&quot;
+baseurl = &quot;&quot;
+languageCode = &quot;en-us&quot;
+title = &quot;zafta - totally refreshing&quot;
+MetaDataFormat = &quot;toml&quot;
+:wq
+
+$
+</code></pre>
+
+<h3 id="generate-the-site">Generate the Site</h3>
+
+<p>Now that we have an empty theme, let&rsquo;s generate the site again.</p>
+
+<pre><code>$ hugo --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+0 pages created 
+0 tags created
+0 categories created
+in 2 ms
+$
+</code></pre>
+
+<p>Did you notice that the output is different? The warning message for the home page has disappeared and we have an additional information line saying that Hugo is syncing from the theme&rsquo;s directory.</p>
+
+<p>Let&rsquo;s check the public/ directory to see what Hugo&rsquo;s created.</p>
+
+<pre><code>$ ls -l public
+total 16
+drwxr-xr-x  2 quoha  staff   68 Sep 29 17:56 css
+-rw-r--r--  1 quoha  staff    0 Sep 29 17:56 index.html
+-rw-r--r--  1 quoha  staff  407 Sep 29 17:56 index.xml
+drwxr-xr-x  2 quoha  staff   68 Sep 29 17:56 js
+-rw-r--r--  1 quoha  staff  243 Sep 29 17:56 sitemap.xml
+$
+</code></pre>
+
+<p>Notice four things:</p>
+
+<ol>
+<li>Hugo created a home page. This is the file public/index.html.</li>
+<li>Hugo created a css/ directory.</li>
+<li>Hugo created a js/ directory.</li>
+<li>Hugo claimed that it created 0 pages. It created a file and copied over static files, but didn&rsquo;t create any pages. That&rsquo;s because it considers a &ldquo;page&rdquo; to be a file created directly from a content file. It doesn&rsquo;t count things like the index.html files that it creates automatically.</li>
+</ol>
+
+<h4 id="the-home-page-1">The Home Page</h4>
+
+<p>Hugo supports many different types of templates. The home page is special because it gets its own type of template and its own template file. The file, layouts/index.html, is used to generate the HTML for the home page. The Hugo documentation says that this is the only required template, but that depends. Hugo&rsquo;s warning message shows that it looks for three different templates:</p>
+
+<pre><code>WARN: 2014/09/29 Unable to locate layout: [index.html _default/list.html _default/single.html]
+</code></pre>
+
+<p>If it can&rsquo;t find any of these, it completely skips creating the home page. We noticed that when we built the site without having a theme installed.</p>
+
+<p>When Hugo created our theme, it created an empty home page template. Now, when we build the site, Hugo finds the template and uses it to generate the HTML for the home page. Since the template file is empty, the HTML file is empty, too. If the template had any rules in it, then Hugo would have used them to generate the home page.</p>
+
+<pre><code>$ find . -name index.html | xargs ls -l
+-rw-r--r--  1 quoha  staff  0 Sep 29 20:21 ./public/index.html
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 ./themes/zafta/layouts/index.html
+$ 
+</code></pre>
+
+<h4 id="the-magic-of-static">The Magic of Static</h4>
+
+<p>Hugo does two things when generating the site. It uses templates to transform content into HTML and it copies static files into the site. Unlike content, static files are not transformed. They are copied exactly as they are.</p>
+
+<p>Hugo assumes that your site will use both CSS and JavaScript, so it creates directories in your theme to hold them. Remember opinions? Well, Hugo&rsquo;s opinion is that you&rsquo;ll store your CSS in a directory named css/ and your JavaScript in a directory named js/. If you don&rsquo;t like that, you can change the directory names in your theme directory or even delete them completely. Hugo&rsquo;s nice enough to offer its opinion, then behave nicely if you disagree.</p>
+
+<pre><code>$ find themes/zafta -type d | xargs ls -ld
+drwxr-xr-x  7 quoha  staff  238 Sep 29 17:38 themes/zafta
+drwxr-xr-x  3 quoha  staff  102 Sep 29 17:31 themes/zafta/archetypes
+drwxr-xr-x  5 quoha  staff  170 Sep 29 17:31 themes/zafta/layouts
+drwxr-xr-x  4 quoha  staff  136 Sep 29 17:31 themes/zafta/layouts/_default
+drwxr-xr-x  4 quoha  staff  136 Sep 29 17:31 themes/zafta/layouts/partials
+drwxr-xr-x  4 quoha  staff  136 Sep 29 17:31 themes/zafta/static
+drwxr-xr-x  2 quoha  staff   68 Sep 29 17:31 themes/zafta/static/css
+drwxr-xr-x  2 quoha  staff   68 Sep 29 17:31 themes/zafta/static/js
+$ 
+</code></pre>
+
+<h2 id="the-theme-development-cycle">The Theme Development Cycle</h2>
+
+<p>When you&rsquo;re working on a theme, you will make changes in the theme&rsquo;s directory, rebuild the site, and check your changes in the browser. Hugo makes this very easy:</p>
+
+<ol>
+<li>Purge the public/ directory.</li>
+<li>Run the built in web server in watch mode.</li>
+<li>Open your site in a browser.</li>
+<li>Update the theme.</li>
+<li>Glance at your browser window to see changes.</li>
+<li>Return to step 4.</li>
+</ol>
+
+<p>I’ll throw in one more opinion: never work on a theme on a live site. Always work on a copy of your site. Make changes to your theme, test them, then copy them up to your site. For added safety, use a tool like Git to keep a revision history of your content and your theme. Believe me when I say that it is too easy to lose both your mind and your changes.</p>
+
+<p>Check the main Hugo site for information on using Git with Hugo.</p>
+
+<h3 id="purge-the-public-directory">Purge the public/ Directory</h3>
+
+<p>When generating the site, Hugo will create new files and update existing ones in the <code>public/</code> directory. It will not delete files that are no longer used. For example, files that were created in the wrong directory or with the wrong title will remain. If you leave them, you might get confused by them later. I recommend cleaning out your site prior to generating it.</p>
+
+<p>Note: If you&rsquo;re building on an SSD, you should ignore this. Churning on a SSD can be costly.</p>
+
+<h3 id="hugo-s-watch-option">Hugo&rsquo;s Watch Option</h3>
+
+<p>Hugo&rsquo;s &ldquo;<code>--watch</code>&rdquo; option will monitor the content/ and your theme directories for changes and rebuild the site automatically.</p>
+
+<h3 id="live-reload">Live Reload</h3>
+
+<p>Hugo&rsquo;s built in web server supports live reload. As pages are saved on the server, the browser is told to refresh the page. Usually, this happens faster than you can say, &ldquo;Wow, that&rsquo;s totally amazing.&rdquo;</p>
+
+<h3 id="development-commands">Development Commands</h3>
+
+<p>Use the following commands as the basis for your workflow.</p>
+
+<pre><code>## purge old files. hugo will recreate the public directory.
+##
+$ rm -rf public
+##
+## run hugo in watch mode
+##
+$ hugo server --watch --verbose
+</code></pre>
+
+<p>Here&rsquo;s sample output showing Hugo detecting a change to the template for the home page. Once generated, the web browser automatically reloaded the page. I&rsquo;ve said this before, it&rsquo;s amazing.</p>
+
+<pre><code>$ rm -rf public
+$ hugo server --watch --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+0 pages created 
+0 tags created
+0 categories created
+in 2 ms
+Watching for changes in /Users/quoha/Sites/zafta/content
+Serving pages from /Users/quoha/Sites/zafta/public
+Web Server is available at http://localhost:1313
+Press Ctrl+C to stop
+INFO: 2014/09/29 File System Event: [&quot;/Users/quoha/Sites/zafta/themes/zafta/layouts/index.html&quot;: MODIFY|ATTRIB]
+Change detected, rebuilding site
+
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+0 pages created 
+0 tags created
+0 categories created
+in 1 ms
+</code></pre>
+
+<h2 id="update-the-home-page-template">Update the Home Page Template</h2>
+
+<p>The home page is one of a few special pages that Hugo creates automatically. As mentioned earlier, it looks for one of three files in the theme&rsquo;s layout/ directory:</p>
+
+<ol>
+<li>index.html</li>
+<li>_default/list.html</li>
+<li>_default/single.html</li>
+</ol>
+
+<p>We could update one of the default templates, but a good design decision is to update the most specific template available. That&rsquo;s not a hard and fast rule (in fact, we&rsquo;ll break it a few times in this tutorial), but it is a good generalization.</p>
+
+<h3 id="make-a-static-home-page">Make a Static Home Page</h3>
+
+<p>Right now, that page is empty because we don&rsquo;t have any content and we don&rsquo;t have any logic in the template. Let&rsquo;s change that by adding some text to the template.</p>
+
+<pre><code>$ vi themes/zafta/layouts/index.html
+&lt;!DOCTYPE html&gt; 
+&lt;html&gt; 
+&lt;body&gt; 
+  &lt;p&gt;hugo says hello!&lt;/p&gt; 
+&lt;/body&gt; 
+&lt;/html&gt; 
+:wq
+
+$
+</code></pre>
+
+<p>Build the web site and then verify the results.</p>
+
+<pre><code>$ hugo --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+0 pages created 
+0 tags created
+0 categories created
+in 2 ms
+
+$ find public -type f -name '*.html' | xargs ls -l
+-rw-r--r--  1 quoha  staff  78 Sep 29 21:26 public/index.html
+
+$ cat public/index.html 
+&lt;!DOCTYPE html&gt; 
+&lt;html&gt; 
+&lt;body&gt; 
+  &lt;p&gt;hugo says hello!&lt;/p&gt; 
+&lt;/html&gt;
+</code></pre>
+
+<h4 id="live-reload-1">Live Reload</h4>
+
+<p>Note: If you&rsquo;re running the server with the <code>--watch</code> option, you&rsquo;ll see different content in the file:</p>
+
+<pre><code>$ cat public/index.html 
+&lt;!DOCTYPE html&gt; 
+&lt;html&gt; 
+&lt;body&gt; 
+  &lt;p&gt;hugo says hello!&lt;/p&gt; 
+&lt;script&gt;document.write('&lt;script src=&quot;http://' 
+        + (location.host || 'localhost').split(':')[0] 
+    + ':1313/livereload.js?mindelay=10&quot;&gt;&lt;/' 
+        + 'script&gt;')&lt;/script&gt;&lt;/body&gt; 
+&lt;/html&gt;
+</code></pre>
+
+<p>When you use <code>--watch</code>, the Live Reload script is added by Hugo. Look for live reload in the documentation to see what it does and how to disable it.</p>
+
+<h3 id="build-a-dynamic-home-page">Build a &ldquo;Dynamic&rdquo; Home Page</h3>
+
+<p>&ldquo;Dynamic home page?&rdquo; Hugo&rsquo;s a static web site generator, so this seems an odd thing to say. I mean let&rsquo;s have the home page automatically reflect the content in the site every time Hugo builds it. We&rsquo;ll use iteration in the template to do that.</p>
+
+<h4 id="create-new-posts">Create New Posts</h4>
+
+<p>Now that we have the home page generating static content, let&rsquo;s add some content to the site. We&rsquo;ll display these posts as a list on the home page and on their own page, too.</p>
+
+<p>Hugo has a command to generate a skeleton post, just like it does for sites and themes.</p>
+
+<pre><code>$ hugo --verbose new post/first.md
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 attempting to create  post/first.md of post
+INFO: 2014/09/29 curpath: /Users/quoha/Sites/zafta/themes/zafta/archetypes/default.md
+ERROR: 2014/09/29 Unable to Cast &lt;nil&gt; to map[string]interface{}
+
+$ 
+</code></pre>
+
+<p>That wasn&rsquo;t very nice, was it?</p>
+
+<p>The &ldquo;new&rdquo; command uses an archetype to create the post file. Hugo created an empty default archetype file, but that causes an error when there&rsquo;s a theme. For me, the workaround was to create an archetypes file specifically for the post type.</p>
+
+<pre><code>$ vi themes/zafta/archetypes/post.md
++++
+Description = &quot;&quot;
+Tags = []
+Categories = []
++++
+:wq
+
+$ find themes/zafta/archetypes -type f | xargs ls -l
+-rw-r--r--  1 quoha  staff   0 Sep 29 21:53 themes/zafta/archetypes/default.md
+-rw-r--r--  1 quoha  staff  51 Sep 29 21:54 themes/zafta/archetypes/post.md
+
+$ hugo --verbose new post/first.md
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 attempting to create  post/first.md of post
+INFO: 2014/09/29 curpath: /Users/quoha/Sites/zafta/themes/zafta/archetypes/post.md
+INFO: 2014/09/29 creating /Users/quoha/Sites/zafta/content/post/first.md
+/Users/quoha/Sites/zafta/content/post/first.md created
+
+$ hugo --verbose new post/second.md
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 attempting to create  post/second.md of post
+INFO: 2014/09/29 curpath: /Users/quoha/Sites/zafta/themes/zafta/archetypes/post.md
+INFO: 2014/09/29 creating /Users/quoha/Sites/zafta/content/post/second.md
+/Users/quoha/Sites/zafta/content/post/second.md created
+
+$ ls -l content/post
+total 16
+-rw-r--r--  1 quoha  staff  104 Sep 29 21:54 first.md
+-rw-r--r--  1 quoha  staff  105 Sep 29 21:57 second.md
+
+$ cat content/post/first.md 
++++
+Categories = []
+Description = &quot;&quot;
+Tags = []
+date = &quot;2014-09-29T21:54:53-05:00&quot;
+title = &quot;first&quot;
+
++++
+my first post
+
+$ cat content/post/second.md 
++++
+Categories = []
+Description = &quot;&quot;
+Tags = []
+date = &quot;2014-09-29T21:57:09-05:00&quot;
+title = &quot;second&quot;
+
++++
+my second post
+
+$ 
+</code></pre>
+
+<p>Build the web site and then verify the results.</p>
+
+<pre><code>$ rm -rf public
+$ hugo --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 found taxonomies: map[string]string{&quot;category&quot;:&quot;categories&quot;, &quot;tag&quot;:&quot;tags&quot;}
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+2 pages created 
+0 tags created
+0 categories created
+in 4 ms
+$
+</code></pre>
+
+<p>The output says that it created 2 pages. Those are our new posts:</p>
+
+<pre><code>$ find public -type f -name '*.html' | xargs ls -l
+-rw-r--r--  1 quoha  staff  78 Sep 29 22:13 public/index.html
+-rw-r--r--  1 quoha  staff   0 Sep 29 22:13 public/post/first/index.html
+-rw-r--r--  1 quoha  staff   0 Sep 29 22:13 public/post/index.html
+-rw-r--r--  1 quoha  staff   0 Sep 29 22:13 public/post/second/index.html
+$
+</code></pre>
+
+<p>The new files are empty because because the templates used to generate the content are empty. The homepage doesn&rsquo;t show the new content, either. We have to update the templates to add the posts.</p>
+
+<h3 id="list-and-single-templates">List and Single Templates</h3>
+
+<p>In Hugo, we have three major kinds of templates. There&rsquo;s the home page template that we updated previously. It is used only by the home page. We also have &ldquo;single&rdquo; templates which are used to generate output for a single content file. We also have &ldquo;list&rdquo; templates that are used to group multiple pieces of content before generating output.</p>
+
+<p>Generally speaking, list templates are named &ldquo;list.html&rdquo; and single templates are named &ldquo;single.html.&rdquo;</p>
+
+<p>There are three other types of templates: partials, content views, and terms. We will not go into much detail on these.</p>
+
+<h3 id="add-content-to-the-homepage">Add Content to the Homepage</h3>
+
+<p>The home page will contain a list of posts. Let&rsquo;s update its template to add the posts that we just created. The logic in the template will run every time we build the site.</p>
+
+<pre><code>$ vi themes/zafta/layouts/index.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  {{ range first 10 .Data.Pages }}
+    &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+  {{ end }}
+&lt;/body&gt;
+&lt;/html&gt;
+:wq
+
+$
+</code></pre>
+
+<p>Hugo uses the Go template engine. That engine scans the template files for commands which are enclosed between &ldquo;{{&rdquo; and &ldquo;}}&rdquo;. In our template, the commands are:</p>
+
+<ol>
+<li>range</li>
+<li>.Title</li>
+<li>end</li>
+</ol>
+
+<p>The &ldquo;range&rdquo; command is an iterator. We&rsquo;re going to use it to go through the first ten pages. Every HTML file that Hugo creates is treated as a page, so looping through the list of pages will look at every file that will be created.</p>
+
+<p>The &ldquo;.Title&rdquo; command prints the value of the &ldquo;title&rdquo; variable. Hugo pulls it from the front matter in the Markdown file.</p>
+
+<p>The &ldquo;end&rdquo; command signals the end of the range iterator. The engine loops back to the top of the iteration when it finds &ldquo;end.&rdquo; Everything between the &ldquo;range&rdquo; and &ldquo;end&rdquo; is evaluated every time the engine goes through the iteration. In this file, that would cause the title from the first ten pages to be output as heading level one.</p>
+
+<p>It&rsquo;s helpful to remember that some variables, like .Data, are created before any output files. Hugo loads every content file into the variable and then gives the template a chance to process before creating the HTML files.</p>
+
+<p>Build the web site and then verify the results.</p>
+
+<pre><code>$ rm -rf public
+$ hugo --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 found taxonomies: map[string]string{&quot;tag&quot;:&quot;tags&quot;, &quot;category&quot;:&quot;categories&quot;}
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+2 pages created 
+0 tags created
+0 categories created
+in 4 ms
+$ find public -type f -name '*.html' | xargs ls -l 
+-rw-r--r--  1 quoha  staff  94 Sep 29 22:23 public/index.html
+-rw-r--r--  1 quoha  staff   0 Sep 29 22:23 public/post/first/index.html
+-rw-r--r--  1 quoha  staff   0 Sep 29 22:23 public/post/index.html
+-rw-r--r--  1 quoha  staff   0 Sep 29 22:23 public/post/second/index.html
+$ cat public/index.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  
+    &lt;h1&gt;second&lt;/h1&gt;
+  
+    &lt;h1&gt;first&lt;/h1&gt;
+  
+&lt;/body&gt;
+&lt;/html&gt;
+$
+</code></pre>
+
+<p>Congratulations, the home page shows the title of the two posts. The posts themselves are still empty, but let&rsquo;s take a moment to appreciate what we&rsquo;ve done. Your template now generates output dynamically. Believe it or not, by inserting the range command inside of those curly braces, you&rsquo;ve learned everything you need to know to build a theme. All that&rsquo;s really left is understanding which template will be used to generate each content file and becoming familiar with the commands for the template engine.</p>
+
+<p>And, if that were entirely true, this tutorial would be much shorter. There are a few things to know that will make creating a new template much easier. Don&rsquo;t worry, though, that&rsquo;s all to come.</p>
+
+<h3 id="add-content-to-the-posts">Add Content to the Posts</h3>
+
+<p>We&rsquo;re working with posts, which are in the content/post/ directory. That means that their section is &ldquo;post&rdquo; (and if we don&rsquo;t do something weird, their type is also &ldquo;post&rdquo;).</p>
+
+<p>Hugo uses the section and type to find the template file for every piece of content. Hugo will first look for a template file that matches the section or type name. If it can&rsquo;t find one, then it will look in the _default/ directory. There are some twists that we&rsquo;ll cover when we get to categories and tags, but for now we can assume that Hugo will try post/single.html, then _default/single.html.</p>
+
+<p>Now that we know the search rule, let&rsquo;s see what we actually have available:</p>
+
+<pre><code>$ find themes/zafta -name single.html | xargs ls -l
+-rw-r--r--  1 quoha  staff  132 Sep 29 17:31 themes/zafta/layouts/_default/single.html
+</code></pre>
+
+<p>We could create a new template, post/single.html, or change the default. Since we don&rsquo;t know of any other content types, let&rsquo;s start with updating the default.</p>
+
+<p>Remember, any content that we haven&rsquo;t created a template for will end up using this template. That can be good or bad. Bad because I know that we&rsquo;re going to be adding different types of content and we&rsquo;re going to end up undoing some of the changes we&rsquo;ve made. It&rsquo;s good because we&rsquo;ll be able to see immediate results. It&rsquo;s also good to start here because we can start to build the basic layout for the site. As we add more content types, we&rsquo;ll refactor this file and move logic around. Hugo makes that fairly painless, so we&rsquo;ll accept the cost and proceed.</p>
+
+<p>Please see the Hugo documentation on template rendering for all the details on determining which template to use. And, as the docs mention, if you&rsquo;re building a single page application (SPA) web site, you can delete all of the other templates and work with just the default single page. That&rsquo;s a refreshing amount of joy right there.</p>
+
+<h4 id="update-the-template-file">Update the Template File</h4>
+
+<pre><code>$ vi themes/zafta/layouts/_default/single.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;{{ .Title }}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+  {{ .Content }}
+&lt;/body&gt;
+&lt;/html&gt;
+:wq
+
+$
+</code></pre>
+
+<p>Build the web site and verify the results.</p>
+
+<pre><code>$ rm -rf public
+$ hugo --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 found taxonomies: map[string]string{&quot;tag&quot;:&quot;tags&quot;, &quot;category&quot;:&quot;categories&quot;}
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+2 pages created 
+0 tags created
+0 categories created
+in 4 ms
+
+$ find public -type f -name '*.html' | xargs ls -l
+-rw-r--r--  1 quoha  staff   94 Sep 29 22:40 public/index.html
+-rw-r--r--  1 quoha  staff  125 Sep 29 22:40 public/post/first/index.html
+-rw-r--r--  1 quoha  staff    0 Sep 29 22:40 public/post/index.html
+-rw-r--r--  1 quoha  staff  128 Sep 29 22:40 public/post/second/index.html
+
+$ cat public/post/first/index.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;first&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;first&lt;/h1&gt;
+  &lt;p&gt;my first post&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+
+$ cat public/post/second/index.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;second&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;second&lt;/h1&gt;
+  &lt;p&gt;my second post&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+$
+</code></pre>
+
+<p>Notice that the posts now have content. You can go to localhost:1313/post/first to verify.</p>
+
+<h3 id="linking-to-content">Linking to Content</h3>
+
+<p>The posts are on the home page. Let&rsquo;s add a link from there to the post. Since this is the home page, we&rsquo;ll update its template.</p>
+
+<pre><code>$ vi themes/zafta/layouts/index.html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  {{ range first 10 .Data.Pages }}
+    &lt;h1&gt;&lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Title }}&lt;/a&gt;&lt;/h1&gt;
+  {{ end }}
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Build the web site and verify the results.</p>
+
+<pre><code>$ rm -rf public
+$ hugo --verbose
+INFO: 2014/09/29 Using config file: /Users/quoha/Sites/zafta/config.toml
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/themes/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 syncing from /Users/quoha/Sites/zafta/static/ to /Users/quoha/Sites/zafta/public/
+INFO: 2014/09/29 found taxonomies: map[string]string{&quot;tag&quot;:&quot;tags&quot;, &quot;category&quot;:&quot;categories&quot;}
+WARN: 2014/09/29 Unable to locate layout: [404.html theme/404.html]
+0 draft content 
+0 future content 
+2 pages created 
+0 tags created
+0 categories created
+in 4 ms
+
+$ find public -type f -name '*.html' | xargs ls -l
+-rw-r--r--  1 quoha  staff  149 Sep 29 22:44 public/index.html
+-rw-r--r--  1 quoha  staff  125 Sep 29 22:44 public/post/first/index.html
+-rw-r--r--  1 quoha  staff    0 Sep 29 22:44 public/post/index.html
+-rw-r--r--  1 quoha  staff  128 Sep 29 22:44 public/post/second/index.html
+
+$ cat public/index.html 
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  
+    &lt;h1&gt;&lt;a href=&quot;/post/second/&quot;&gt;second&lt;/a&gt;&lt;/h1&gt;
+  
+    &lt;h1&gt;&lt;a href=&quot;/post/first/&quot;&gt;first&lt;/a&gt;&lt;/h1&gt;
+  
+&lt;/body&gt;
+&lt;/html&gt;
+
+$
+</code></pre>
+
+<h3 id="create-a-post-listing">Create a Post Listing</h3>
+
+<p>We have the posts displaying on the home page and on their own page. We also have a file public/post/index.html that is empty. Let&rsquo;s make it show a list of all posts (not just the first ten).</p>
+
+<p>We need to decide which template to update. This will be a listing, so it should be a list template. Let&rsquo;s take a quick look and see which list templates are available.</p>
+
+<pre><code>$ find themes/zafta -name list.html | xargs ls -l
+-rw-r--r--  1 quoha  staff  0 Sep 29 17:31 themes/zafta/layouts/_default/list.html
+</code></pre>
+
+<p>As with the single post, we have to decide to update _default/list.html or create post/list.html. We still don&rsquo;t have multiple content types, so let&rsquo;s stay consistent and update the default list template.</p>
+
+<h2 id="creating-top-level-pages">Creating Top Level Pages</h2>
+
+<p>Let&rsquo;s add an &ldquo;about&rdquo; page and display it at the top level (as opposed to a sub-level like we did with posts).</p>
+
+<p>The default in Hugo is to use the directory structure of the content/ directory to guide the location of the generated html in the public/ directory. Let&rsquo;s verify that by creating an &ldquo;about&rdquo; page at the top level:</p>
+
+<pre><code>$ vi content/about.md 
++++
+title = &quot;about&quot;
+description = &quot;about this site&quot;
+date = &quot;2014-09-27&quot;
+slug = &quot;about time&quot;
++++
+
+## about us
+
+i'm speechless
+:wq
+</code></pre>
+
+<p>Generate the web site and verify the results.</p>
+
+<pre><code>$ find public -name '*.html' | xargs ls -l
+-rw-rw-r--  1 mdhender  staff   334 Sep 27 15:08 public/about-time/index.html
+-rw-rw-r--  1 mdhender  staff   527 Sep 27 15:08 public/index.html
+-rw-rw-r--  1 mdhender  staff   358 Sep 27 15:08 public/post/first-post/index.html
+-rw-rw-r--  1 mdhender  staff     0 Sep 27 15:08 public/post/index.html
+-rw-rw-r--  1 mdhender  staff   342 Sep 27 15:08 public/post/second-post/index.html
+</code></pre>
+
+<p>Notice that the page wasn&rsquo;t created at the top level. It was created in a sub-directory named &lsquo;about-time/&rsquo;. That name came from our slug. Hugo will use the slug to name the generated content. It&rsquo;s a reasonable default, by the way, but we can learn a few things by fighting it for this file.</p>
+
+<p>One other thing. Take a look at the home page.</p>
+
+<pre><code>$ cat public/index.html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+    &lt;h1&gt;&lt;a href=&quot;http://localhost:1313/post/theme/&quot;&gt;creating a new theme&lt;/a&gt;&lt;/h1&gt;
+    &lt;h1&gt;&lt;a href=&quot;http://localhost:1313/about-time/&quot;&gt;about&lt;/a&gt;&lt;/h1&gt;
+    &lt;h1&gt;&lt;a href=&quot;http://localhost:1313/post/second-post/&quot;&gt;second&lt;/a&gt;&lt;/h1&gt;
+    &lt;h1&gt;&lt;a href=&quot;http://localhost:1313/post/first-post/&quot;&gt;first&lt;/a&gt;&lt;/h1&gt;
+&lt;script&gt;document.write('&lt;script src=&quot;http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10&quot;&gt;&lt;/'
+        + 'script&gt;')&lt;/script&gt;&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Notice that the &ldquo;about&rdquo; link is listed with the posts? That&rsquo;s not desirable, so let&rsquo;s change that first.</p>
+
+<pre><code>$ vi themes/zafta/layouts/index.html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body&gt;
+  &lt;h1&gt;posts&lt;/h1&gt;
+  {{ range first 10 .Data.Pages }}
+    {{ if eq .Type &quot;post&quot;}}
+      &lt;h2&gt;&lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Title }}&lt;/a&gt;&lt;/h2&gt;
+    {{ end }}
+  {{ end }}
+
+  &lt;h1&gt;pages&lt;/h1&gt;
+  {{ range .Data.Pages }}
+    {{ if eq .Type &quot;page&quot; }}
+      &lt;h2&gt;&lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Title }}&lt;/a&gt;&lt;/h2&gt;
+    {{ end }}
+  {{ end }}
+&lt;/body&gt;
+&lt;/html&gt;
+:wq
+</code></pre>
+
+<p>Generate the web site and verify the results. The home page has two sections, posts and pages, and each section has the right set of headings and links in it.</p>
+
+<p>But, that about page still renders to about-time/index.html.</p>
+
+<pre><code>$ find public -name '*.html' | xargs ls -l
+-rw-rw-r--  1 mdhender  staff    334 Sep 27 15:33 public/about-time/index.html
+-rw-rw-r--  1 mdhender  staff    645 Sep 27 15:33 public/index.html
+-rw-rw-r--  1 mdhender  staff    358 Sep 27 15:33 public/post/first-post/index.html
+-rw-rw-r--  1 mdhender  staff      0 Sep 27 15:33 public/post/index.html
+-rw-rw-r--  1 mdhender  staff    342 Sep 27 15:33 public/post/second-post/index.html
+</code></pre>
+
+<p>Knowing that hugo is using the slug to generate the file name, the simplest solution is to change the slug. Let&rsquo;s do it the hard way and change the permalink in the configuration file.</p>
+
+<pre><code>$ vi config.toml
+[permalinks]
+	page = &quot;/:title/&quot;
+	about = &quot;/:filename/&quot;
+</code></pre>
+
+<p>Generate the web site and verify that this didn&rsquo;t work. Hugo lets &ldquo;slug&rdquo; or &ldquo;URL&rdquo; override the permalinks setting in the configuration file. Go ahead and comment out the slug in content/about.md, then generate the web site to get it to be created in the right place.</p>
+
+<h2 id="sharing-templates">Sharing Templates</h2>
+
+<p>If you&rsquo;ve been following along, you probably noticed that posts have titles in the browser and the home page doesn&rsquo;t. That&rsquo;s because we didn&rsquo;t put the title in the home page&rsquo;s template (layouts/index.html). That&rsquo;s an easy thing to do, but let&rsquo;s look at a different option.</p>
+
+<p>We can put the common bits into a shared template that&rsquo;s stored in the themes/zafta/layouts/partials/ directory.</p>
+
+<h3 id="create-the-header-and-footer-partials">Create the Header and Footer Partials</h3>
+
+<p>In Hugo, a partial is a sugar-coated template. Normally a template reference has a path specified. Partials are different. Hugo searches for them along a TODO defined search path. This makes it easier for end-users to override the theme&rsquo;s presentation.</p>
+
+<pre><code>$ vi themes/zafta/layouts/partials/header.html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+	&lt;title&gt;{{ .Title }}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+:wq
+
+$ vi themes/zafta/layouts/partials/footer.html
+&lt;/body&gt;
+&lt;/html&gt;
+:wq
+</code></pre>
+
+<h3 id="update-the-home-page-template-to-use-the-partials">Update the Home Page Template to Use the Partials</h3>
+
+<p>The most noticeable difference between a template call and a partials call is the lack of path:</p>
+
+<pre><code>{{ template &quot;theme/partials/header.html&quot; . }}
+</code></pre>
+
+<p>versus</p>
+
+<pre><code>{{ partial &quot;header.html&quot; . }}
+</code></pre>
+
+<p>Both pass in the context.</p>
+
+<p>Let&rsquo;s change the home page template to use these new partials.</p>
+
+<pre><code>$ vi themes/zafta/layouts/index.html
+{{ partial &quot;header.html&quot; . }}
+
+  &lt;h1&gt;posts&lt;/h1&gt;
+  {{ range first 10 .Data.Pages }}
+    {{ if eq .Type &quot;post&quot;}}
+      &lt;h2&gt;&lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Title }}&lt;/a&gt;&lt;/h2&gt;
+    {{ end }}
+  {{ end }}
+
+  &lt;h1&gt;pages&lt;/h1&gt;
+  {{ range .Data.Pages }}
+    {{ if or (eq .Type &quot;page&quot;) (eq .Type &quot;about&quot;) }}
+      &lt;h2&gt;&lt;a href=&quot;{{ .Permalink }}&quot;&gt;{{ .Type }} - {{ .Title }} - {{ .RelPermalink }}&lt;/a&gt;&lt;/h2&gt;
+    {{ end }}
+  {{ end }}
+
+{{ partial &quot;footer.html&quot; . }}
+:wq
+</code></pre>
+
+<p>Generate the web site and verify the results. The title on the home page is now &ldquo;your title here&rdquo;, which comes from the &ldquo;title&rdquo; variable in the config.toml file.</p>
+
+<h3 id="update-the-default-single-template-to-use-the-partials">Update the Default Single Template to Use the Partials</h3>
+
+<pre><code>$ vi themes/zafta/layouts/_default/single.html
+{{ partial &quot;header.html&quot; . }}
+
+  &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+  {{ .Content }}
+
+{{ partial &quot;footer.html&quot; . }}
+:wq
+</code></pre>
+
+<p>Generate the web site and verify the results. The title on the posts and the about page should both reflect the value in the markdown file.</p>
+
+<h2 id="add-date-published-to-posts">Add “Date Published” to Posts</h2>
+
+<p>It&rsquo;s common to have posts display the date that they were written or published, so let&rsquo;s add that. The front matter of our posts has a variable named &ldquo;date.&rdquo; It&rsquo;s usually the date the content was created, but let&rsquo;s pretend that&rsquo;s the value we want to display.</p>
+
+<h3 id="add-date-published-to-the-template">Add “Date Published” to the Template</h3>
+
+<p>We&rsquo;ll start by updating the template used to render the posts. The template code will look like:</p>
+
+<pre><code>{{ .Date.Format &quot;Mon, Jan 2, 2006&quot; }}
+</code></pre>
+
+<p>Posts use the default single template, so we&rsquo;ll change that file.</p>
+
+<pre><code>$ vi themes/zafta/layouts/_default/single.html
+{{ partial &quot;header.html&quot; . }}
+
+  &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+  &lt;h2&gt;{{ .Date.Format &quot;Mon, Jan 2, 2006&quot; }}&lt;/h2&gt;
+  {{ .Content }}
+
+{{ partial &quot;footer.html&quot; . }}
+:wq
+</code></pre>
+
+<p>Generate the web site and verify the results. The posts now have the date displayed in them. There&rsquo;s a problem, though. The &ldquo;about&rdquo; page also has the date displayed.</p>
+
+<p>As usual, there are a couple of ways to make the date display only on posts. We could do an &ldquo;if&rdquo; statement like we did on the home page. Another way would be to create a separate template for posts.</p>
+
+<p>The &ldquo;if&rdquo; solution works for sites that have just a couple of content types. It aligns with the principle of &ldquo;code for today,&rdquo; too.</p>
+
+<p>Let&rsquo;s assume, though, that we&rsquo;ve made our site so complex that we feel we have to create a new template type. In Hugo-speak, we&rsquo;re going to create a section template.</p>
+
+<p>Let&rsquo;s restore the default single template before we forget.</p>
+
+<pre><code>$ mkdir themes/zafta/layouts/post
+$ vi themes/zafta/layouts/_default/single.html
+{{ partial &quot;header.html&quot; . }}
+
+  &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+  {{ .Content }}
+
+{{ partial &quot;footer.html&quot; . }}
+:wq
+</code></pre>
+
+<p>Now we&rsquo;ll update the post&rsquo;s version of the single template. If you remember Hugo&rsquo;s rules, the template engine will use this version over the default.</p>
+
+<pre><code>$ vi themes/zafta/layouts/post/single.html
+{{ partial &quot;header.html&quot; . }}
+
+  &lt;h1&gt;{{ .Title }}&lt;/h1&gt;
+  &lt;h2&gt;{{ .Date.Format &quot;Mon, Jan 2, 2006&quot; }}&lt;/h2&gt;
+  {{ .Content }}
+
+{{ partial &quot;footer.html&quot; . }}
+:wq
+
+</code></pre>
+
+<p>Note that we removed the date logic from the default template and put it in the post template. Generate the web site and verify the results. Posts have dates and the about page doesn&rsquo;t.</p>
+
+<h3 id="don-t-repeat-yourself">Don&rsquo;t Repeat Yourself</h3>
+
+<p>DRY is a good design goal and Hugo does a great job supporting it. Part of the art of a good template is knowing when to add a new template and when to update an existing one. While you&rsquo;re figuring that out, accept that you&rsquo;ll be doing some refactoring. Hugo makes that easy and fast, so it&rsquo;s okay to delay splitting up a template.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>(Hu)go Template Primer</title>
+			<link>/posts/goisforlovers/</link>
+			<pubDate>Wed, 02 Apr 2014 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/goisforlovers/</guid>
+			<description>Hugo uses the excellent Go html/template library for its template engine. It is an extremely lightweight engine that provides a very small amount of logic. In our experience that it is just the right amount of logic to be able to create a good static website. If you have used other template systems from different languages or frameworks you will find a lot of similarities in Go templates.
+This document is a brief primer on using Go templates.</description>
+			<content type="html"><![CDATA[
+
+<p>Hugo uses the excellent <a href="https://golang.org/">Go</a> <a href="https://golang.org/pkg/html/template/">html/template</a> library for
+its template engine. It is an extremely lightweight engine that provides a very
+small amount of logic. In our experience that it is just the right amount of
+logic to be able to create a good static website. If you have used other
+template systems from different languages or frameworks you will find a lot of
+similarities in Go templates.</p>
+
+<p>This document is a brief primer on using Go templates. The <a href="https://golang.org/pkg/html/template/">Go docs</a>
+provide more details.</p>
+
+<h2 id="introduction-to-go-templates">Introduction to Go Templates</h2>
+
+<p>Go templates provide an extremely simple template language. It adheres to the
+belief that only the most basic of logic belongs in the template or view layer.
+One consequence of this simplicity is that Go templates parse very quickly.</p>
+
+<p>A unique characteristic of Go templates is they are content aware. Variables and
+content will be sanitized depending on the context of where they are used. More
+details can be found in the <a href="https://golang.org/pkg/html/template/">Go docs</a>.</p>
+
+<h2 id="basic-syntax">Basic Syntax</h2>
+
+<p>Golang templates are HTML files with the addition of variables and
+functions.</p>
+
+<p><strong>Go variables and functions are accessible within {{ }}</strong></p>
+
+<p>Accessing a predefined variable &ldquo;foo&rdquo;:</p>
+
+<pre><code>{{ foo }}
+</code></pre>
+
+<p><strong>Parameters are separated using spaces</strong></p>
+
+<p>Calling the add function with input of 1, 2:</p>
+
+<pre><code>{{ add 1 2 }}
+</code></pre>
+
+<p><strong>Methods and fields are accessed via dot notation</strong></p>
+
+<p>Accessing the Page Parameter &ldquo;bar&rdquo;</p>
+
+<pre><code>{{ .Params.bar }}
+</code></pre>
+
+<p><strong>Parentheses can be used to group items together</strong></p>
+
+<pre><code>{{ if or (isset .Params &quot;alt&quot;) (isset .Params &quot;caption&quot;) }} Caption {{ end }}
+</code></pre>
+
+<h2 id="variables">Variables</h2>
+
+<p>Each Go template has a struct (object) made available to it. In hugo each
+template is passed either a page or a node struct depending on which type of
+page you are rendering. More details are available on the
+<a href="/layout/variables">variables</a> page.</p>
+
+<p>A variable is accessed by referencing the variable name.</p>
+
+<pre><code>&lt;title&gt;{{ .Title }}&lt;/title&gt;
+</code></pre>
+
+<p>Variables can also be defined and referenced.</p>
+
+<pre><code>{{ $address := &quot;123 Main St.&quot;}}
+{{ $address }}
+</code></pre>
+
+<h2 id="functions">Functions</h2>
+
+<p>Go template ship with a few functions which provide basic functionality. The Go
+template system also provides a mechanism for applications to extend the
+available functions with their own. <a href="/layout/functions">Hugo template
+functions</a> provide some additional functionality we believe
+are useful for building websites. Functions are called by using their name
+followed by the required parameters separated by spaces. Template
+functions cannot be added without recompiling hugo.</p>
+
+<p><strong>Example:</strong></p>
+
+<pre><code>{{ add 1 2 }}
+</code></pre>
+
+<h2 id="includes">Includes</h2>
+
+<p>When including another template you will pass to it the data it will be
+able to access. To pass along the current context please remember to
+include a trailing dot. The templates location will always be starting at
+the /layout/ directory within Hugo.</p>
+
+<p><strong>Example:</strong></p>
+
+<pre><code>{{ template &quot;chrome/header.html&quot; . }}
+</code></pre>
+
+<h2 id="logic">Logic</h2>
+
+<p>Go templates provide the most basic iteration and conditional logic.</p>
+
+<h3 id="iteration">Iteration</h3>
+
+<p>Just like in Go, the Go templates make heavy use of range to iterate over
+a map, array or slice. The following are different examples of how to use
+range.</p>
+
+<p><strong>Example 1: Using Context</strong></p>
+
+<pre><code>{{ range array }}
+    {{ . }}
+{{ end }}
+</code></pre>
+
+<p><strong>Example 2: Declaring value variable name</strong></p>
+
+<pre><code>{{range $element := array}}
+    {{ $element }}
+{{ end }}
+</code></pre>
+
+<p><strong>Example 2: Declaring key and value variable name</strong></p>
+
+<pre><code>{{range $index, $element := array}}
+    {{ $index }}
+    {{ $element }}
+{{ end }}
+</code></pre>
+
+<h3 id="conditionals">Conditionals</h3>
+
+<p>If, else, with, or, &amp; and provide the framework for handling conditional
+logic in Go Templates. Like range, each statement is closed with <code>end</code>.</p>
+
+<p>Go Templates treat the following values as false:</p>
+
+<ul>
+<li>false</li>
+<li>0</li>
+<li>any array, slice, map, or string of length zero</li>
+</ul>
+
+<p><strong>Example 1: If</strong></p>
+
+<pre><code>{{ if isset .Params &quot;title&quot; }}&lt;h4&gt;{{ index .Params &quot;title&quot; }}&lt;/h4&gt;{{ end }}
+</code></pre>
+
+<p><strong>Example 2: If -&gt; Else</strong></p>
+
+<pre><code>{{ if isset .Params &quot;alt&quot; }}
+    {{ index .Params &quot;alt&quot; }}
+{{else}}
+    {{ index .Params &quot;caption&quot; }}
+{{ end }}
+</code></pre>
+
+<p><strong>Example 3: And &amp; Or</strong></p>
+
+<pre><code>{{ if and (or (isset .Params &quot;title&quot;) (isset .Params &quot;caption&quot;)) (isset .Params &quot;attr&quot;)}}
+</code></pre>
+
+<p><strong>Example 4: With</strong></p>
+
+<p>An alternative way of writing &ldquo;if&rdquo; and then referencing the same value
+is to use &ldquo;with&rdquo; instead. With rebinds the context <code>.</code> within its scope,
+and skips the block if the variable is absent.</p>
+
+<p>The first example above could be simplified as:</p>
+
+<pre><code>{{ with .Params.title }}&lt;h4&gt;{{ . }}&lt;/h4&gt;{{ end }}
+</code></pre>
+
+<p><strong>Example 5: If -&gt; Else If</strong></p>
+
+<pre><code>{{ if isset .Params &quot;alt&quot; }}
+    {{ index .Params &quot;alt&quot; }}
+{{ else if isset .Params &quot;caption&quot; }}
+    {{ index .Params &quot;caption&quot; }}
+{{ end }}
+</code></pre>
+
+<h2 id="pipes">Pipes</h2>
+
+<p>One of the most powerful components of Go templates is the ability to
+stack actions one after another. This is done by using pipes. Borrowed
+from unix pipes, the concept is simple, each pipeline&rsquo;s output becomes the
+input of the following pipe.</p>
+
+<p>Because of the very simple syntax of Go templates, the pipe is essential
+to being able to chain together function calls. One limitation of the
+pipes is that they only can work with a single value and that value
+becomes the last parameter of the next pipeline.</p>
+
+<p>A few simple examples should help convey how to use the pipe.</p>
+
+<p><strong>Example 1 :</strong></p>
+
+<pre><code>{{ if eq 1 1 }} Same {{ end }}
+</code></pre>
+
+<p>is the same as</p>
+
+<pre><code>{{ eq 1 1 | if }} Same {{ end }}
+</code></pre>
+
+<p>It does look odd to place the if at the end, but it does provide a good
+illustration of how to use the pipes.</p>
+
+<p><strong>Example 2 :</strong></p>
+
+<pre><code>{{ index .Params &quot;disqus_url&quot; | html }}
+</code></pre>
+
+<p>Access the page parameter called &ldquo;disqus_url&rdquo; and escape the HTML.</p>
+
+<p><strong>Example 3 :</strong></p>
+
+<pre><code>{{ if or (or (isset .Params &quot;title&quot;) (isset .Params &quot;caption&quot;)) (isset .Params &quot;attr&quot;)}}
+Stuff Here
+{{ end }}
+</code></pre>
+
+<p>Could be rewritten as</p>
+
+<pre><code>{{  isset .Params &quot;caption&quot; | or isset .Params &quot;title&quot; | or isset .Params &quot;attr&quot; | if }}
+Stuff Here
+{{ end }}
+</code></pre>
+
+<h2 id="context-aka-the-dot">Context (aka. the dot)</h2>
+
+<p>The most easily overlooked concept to understand about Go templates is that {{ . }}
+always refers to the current context. In the top level of your template this
+will be the data set made available to it. Inside of a iteration it will have
+the value of the current item. When inside of a loop the context has changed. .
+will no longer refer to the data available to the entire page. If you need to
+access this from within the loop you will likely want to set it to a variable
+instead of depending on the context.</p>
+
+<p><strong>Example:</strong></p>
+
+<pre><code>  {{ $title := .Site.Title }}
+  {{ range .Params.tags }}
+    &lt;li&gt; &lt;a href=&quot;{{ $baseurl }}/tags/{{ . | urlize }}&quot;&gt;{{ . }}&lt;/a&gt; - {{ $title }} &lt;/li&gt;
+  {{ end }}
+</code></pre>
+
+<p>Notice how once we have entered the loop the value of {{ . }} has changed. We
+have defined a variable outside of the loop so we have access to it from within
+the loop.</p>
+
+<h1 id="hugo-parameters">Hugo Parameters</h1>
+
+<p>Hugo provides the option of passing values to the template language
+through the site configuration (for sitewide values), or through the meta
+data of each specific piece of content. You can define any values of any
+type (supported by your front matter/config format) and use them however
+you want to inside of your templates.</p>
+
+<h2 id="using-content-page-parameters">Using Content (page) Parameters</h2>
+
+<p>In each piece of content you can provide variables to be used by the
+templates. This happens in the <a href="/content/front-matter">front matter</a>.</p>
+
+<p>An example of this is used in this documentation site. Most of the pages
+benefit from having the table of contents provided. Sometimes the TOC just
+doesn&rsquo;t make a lot of sense. We&rsquo;ve defined a variable in our front matter
+of some pages to turn off the TOC from being displayed.</p>
+
+<p>Here is the example front matter:</p>
+
+<pre><code>---
+title: &quot;Permalinks&quot;
+date: &quot;2013-11-18&quot;
+aliases:
+  - &quot;/doc/permalinks/&quot;
+groups: [&quot;extras&quot;]
+groups_weight: 30
+notoc: true
+---
+</code></pre>
+
+<p>Here is the corresponding code inside of the template:</p>
+
+<pre><code>  {{ if not .Params.notoc }}
+    &lt;div id=&quot;toc&quot; class=&quot;well col-md-4 col-sm-6&quot;&gt;
+    {{ .TableOfContents }}
+    &lt;/div&gt;
+  {{ end }}
+</code></pre>
+
+<h2 id="using-site-config-parameters">Using Site (config) Parameters</h2>
+
+<p>In your top-level configuration file (eg, <code>config.yaml</code>) you can define site
+parameters, which are values which will be available to you in chrome.</p>
+
+<p>For instance, you might declare:</p>
+<div class="highlight"><pre class="chroma"><code class="language-yaml" data-lang="yaml">params<span class="p">:</span><span class="w">
+</span><span class="w">  </span>CopyrightHTML<span class="p">:</span><span class="w"> </span><span class="s2">&#34;Copyright &amp;#xA9; 2013 John Doe. All Rights Reserved.&#34;</span><span class="w">
+</span><span class="w">  </span>TwitterUser<span class="p">:</span><span class="w"> </span><span class="s2">&#34;spf13&#34;</span><span class="w">
+</span><span class="w">  </span>SidebarRecentLimit<span class="p">:</span><span class="w"> </span><span class="m">5</span></code></pre></div>
+<p>Within a footer layout, you might then declare a <code>&lt;footer&gt;</code> which is only
+provided if the <code>CopyrightHTML</code> parameter is provided, and if it is given,
+you would declare it to be HTML-safe, so that the HTML entity is not escaped
+again.  This would let you easily update just your top-level config file each
+January 1st, instead of hunting through your templates.</p>
+
+<pre><code>{{if .Site.Params.CopyrightHTML}}&lt;footer&gt;
+&lt;div class=&quot;text-center&quot;&gt;{{.Site.Params.CopyrightHTML | safeHtml}}&lt;/div&gt;
+&lt;/footer&gt;{{end}}
+</code></pre>
+
+<p>An alternative way of writing the &ldquo;if&rdquo; and then referencing the same value
+is to use &ldquo;with&rdquo; instead. With rebinds the context <code>.</code> within its scope,
+and skips the block if the variable is absent:</p>
+
+<pre><code>{{with .Site.Params.TwitterUser}}&lt;span class=&quot;twitter&quot;&gt;
+&lt;a href=&quot;https://twitter.com/{{.}}&quot; rel=&quot;author&quot;&gt;
+&lt;img src=&quot;/images/twitter.png&quot; width=&quot;48&quot; height=&quot;48&quot; title=&quot;Twitter: {{.}}&quot;
+ alt=&quot;Twitter&quot;&gt;&lt;/a&gt;
+&lt;/span&gt;{{end}}
+</code></pre>
+
+<p>Finally, if you want to pull &ldquo;magic constants&rdquo; out of your layouts, you can do
+so, such as in this example:</p>
+
+<pre><code>&lt;nav class=&quot;recent&quot;&gt;
+  &lt;h1&gt;Recent Posts&lt;/h1&gt;
+  &lt;ul&gt;{{range first .Site.Params.SidebarRecentLimit .Site.Recent}}
+    &lt;li&gt;&lt;a href=&quot;{{.RelPermalink}}&quot;&gt;{{.Title}}&lt;/a&gt;&lt;/li&gt;
+  {{end}}&lt;/ul&gt;
+&lt;/nav&gt;
+</code></pre>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Getting Started with Hugo</title>
+			<link>/posts/hugoisforlovers/</link>
+			<pubDate>Wed, 02 Apr 2014 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/hugoisforlovers/</guid>
+			<description>Step 1. Install Hugo Go to Hugo releases and download the appropriate version for your OS and architecture.
+Save it somewhere specific as we will be using it in the next step.
+More complete instructions are available at Install Hugo
+Step 2. Build the Docs Hugo has its own example site which happens to also be the documentation site you are reading right now.
+Follow the following steps:
+ Clone the Hugo repository Go into the repo Run hugo in server mode and build the docs Open your browser to http://localhost:1313  Corresponding pseudo commands:</description>
+			<content type="html"><![CDATA[
+
+<h2 id="step-1-install-hugo">Step 1. Install Hugo</h2>
+
+<p>Go to <a href="https://github.com/spf13/hugo/releases">Hugo releases</a> and download the
+appropriate version for your OS and architecture.</p>
+
+<p>Save it somewhere specific as we will be using it in the next step.</p>
+
+<p>More complete instructions are available at <a href="https://gohugo.io/getting-started/installing/">Install Hugo</a></p>
+
+<h2 id="step-2-build-the-docs">Step 2. Build the Docs</h2>
+
+<p>Hugo has its own example site which happens to also be the documentation site
+you are reading right now.</p>
+
+<p>Follow the following steps:</p>
+
+<ol>
+<li>Clone the <a href="http://github.com/spf13/hugo">Hugo repository</a></li>
+<li>Go into the repo</li>
+<li>Run hugo in server mode and build the docs</li>
+<li>Open your browser to <a href="http://localhost:1313">http://localhost:1313</a></li>
+</ol>
+
+<p>Corresponding pseudo commands:</p>
+
+<pre><code>git clone https://github.com/spf13/hugo
+cd hugo
+/path/to/where/you/installed/hugo server --source=./docs
+&gt; 29 pages created
+&gt; 0 tags index created
+&gt; in 27 ms
+&gt; Web Server is available at http://localhost:1313
+&gt; Press ctrl+c to stop
+</code></pre>
+
+<p>Once you&rsquo;ve gotten here, follow along the rest of this page on your local build.</p>
+
+<h2 id="step-3-change-the-docs-site">Step 3. Change the docs site</h2>
+
+<p>Stop the Hugo process by hitting Ctrl+C.</p>
+
+<p>Now we are going to run hugo again, but this time with hugo in watch mode.</p>
+
+<pre><code>/path/to/hugo/from/step/1/hugo server --source=./docs --watch
+&gt; 29 pages created
+&gt; 0 tags index created
+&gt; in 27 ms
+&gt; Web Server is available at http://localhost:1313
+&gt; Watching for changes in /Users/spf13/Code/hugo/docs/content
+&gt; Press ctrl+c to stop
+</code></pre>
+
+<p>Open your <a href="http://vim.spf13.com">favorite editor</a> and change one of the source
+content pages. How about changing this very file to <em>fix the typo</em>. How about changing this very file to <em>fix the typo</em>.</p>
+
+<p>Content files are found in <code>docs/content/</code>. Unless otherwise specified, files
+are located at the same relative location as the url, in our case
+<code>docs/content/overview/quickstart.md</code>.</p>
+
+<p>Change and save this file.. Notice what happened in your terminal.</p>
+
+<pre><code>&gt; Change detected, rebuilding site
+
+&gt; 29 pages created
+&gt; 0 tags index created
+&gt; in 26 ms
+</code></pre>
+
+<p>Refresh the browser and observe that the typo is now fixed.</p>
+
+<p>Notice how quick that was. Try to refresh the site before it&rsquo;s finished building. I double dare you.
+Having nearly instant feedback enables you to have your creativity flow without waiting for long builds.</p>
+
+<h2 id="step-4-have-fun">Step 4. Have fun</h2>
+
+<p>The best way to learn something is to play with it.</p>
+]]></content>
+		</item>
+		
+		<item>
+			<title>Migrate to Hugo from Jekyll</title>
+			<link>/posts/migrate-from-jekyll/</link>
+			<pubDate>Mon, 10 Mar 2014 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/migrate-from-jekyll/</guid>
+			<description>Move static content to static Jekyll has a rule that any directory not starting with _ will be copied as-is to the _site output. Hugo keeps all static content under static. You should therefore move it all there. With Jekyll, something that looked like
+▾ &amp;lt;root&amp;gt;/ ▾ images/ logo.png  should become
+▾ &amp;lt;root&amp;gt;/ ▾ static/ ▾ images/ logo.png  Additionally, you&amp;rsquo;ll want any files that should reside at the root (such as CNAME) to be moved to static.</description>
+			<content type="html"><![CDATA[
+
+<h2 id="move-static-content-to-static">Move static content to <code>static</code></h2>
+
+<p>Jekyll has a rule that any directory not starting with <code>_</code> will be copied as-is to the <code>_site</code> output. Hugo keeps all static content under <code>static</code>. You should therefore move it all there.
+With Jekyll, something that looked like</p>
+
+<pre><code>▾ &lt;root&gt;/
+    ▾ images/
+        logo.png
+</code></pre>
+
+<p>should become</p>
+
+<pre><code>▾ &lt;root&gt;/
+    ▾ static/
+        ▾ images/
+            logo.png
+</code></pre>
+
+<p>Additionally, you&rsquo;ll want any files that should reside at the root (such as <code>CNAME</code>) to be moved to <code>static</code>.</p>
+
+<h2 id="create-your-hugo-configuration-file">Create your Hugo configuration file</h2>
+
+<p>Hugo can read your configuration as JSON, YAML or TOML. Hugo supports parameters custom configuration too. Refer to the <a href="/overview/configuration/">Hugo configuration documentation</a> for details.</p>
+
+<h2 id="set-your-configuration-publish-folder-to-site">Set your configuration publish folder to <code>_site</code></h2>
+
+<p>The default is for Jekyll to publish to <code>_site</code> and for Hugo to publish to <code>public</code>. If, like me, you have <a href="http://blog.blindgaenger.net/generate_github_pages_in_a_submodule.html"><code>_site</code> mapped to a git submodule on the <code>gh-pages</code> branch</a>, you&rsquo;ll want to do one of two alternatives:</p>
+
+<ol>
+<li><p>Change your submodule to point to map <code>gh-pages</code> to public instead of <code>_site</code> (recommended).</p>
+
+<pre><code>git submodule deinit _site
+git rm _site
+git submodule add -b gh-pages git@github.com:your-username/your-repo.git public
+</code></pre></li>
+
+<li><p>Or, change the Hugo configuration to use <code>_site</code> instead of <code>public</code>.</p>
+
+<pre><code>{
+    ..
+    &quot;publishdir&quot;: &quot;_site&quot;,
+    ..
+}
+</code></pre></li>
+</ol>
+
+<h2 id="convert-jekyll-templates-to-hugo-templates">Convert Jekyll templates to Hugo templates</h2>
+
+<p>That&rsquo;s the bulk of the work right here. The documentation is your friend. You should refer to <a href="http://jekyllrb.com/docs/templates/">Jekyll&rsquo;s template documentation</a> if you need to refresh your memory on how you built your blog and <a href="/layout/templates/">Hugo&rsquo;s template</a> to learn Hugo&rsquo;s way.</p>
+
+<p>As a single reference data point, converting my templates for <a href="http://heyitsalex.net/">heyitsalex.net</a> took me no more than a few hours.</p>
+
+<h2 id="convert-jekyll-plugins-to-hugo-shortcodes">Convert Jekyll plugins to Hugo shortcodes</h2>
+
+<p>Jekyll has <a href="http://jekyllrb.com/docs/plugins/">plugins</a>; Hugo has <a href="/doc/shortcodes/">shortcodes</a>. It&rsquo;s fairly trivial to do a port.</p>
+
+<h3 id="implementation">Implementation</h3>
+
+<p>As an example, I was using a custom <a href="https://github.com/alexandre-normand/alexandre-normand/blob/74bb12036a71334fdb7dba84e073382fc06908ec/_plugins/image_tag.rb"><code>image_tag</code></a> plugin to generate figures with caption when running Jekyll. As I read about shortcodes, I found Hugo had a nice built-in shortcode that does exactly the same thing.</p>
+
+<p>Jekyll&rsquo;s plugin:</p>
+
+<pre><code>module Jekyll
+  class ImageTag &lt; Liquid::Tag
+    @url = nil
+    @caption = nil
+    @class = nil
+    @link = nil
+    // Patterns
+    IMAGE_URL_WITH_CLASS_AND_CAPTION =
+    IMAGE_URL_WITH_CLASS_AND_CAPTION_AND_LINK = /(\w+)(\s+)((https?:\/\/|\/)(\S+))(\s+)&quot;(.*?)&quot;(\s+)-&gt;((https?:\/\/|\/)(\S+))(\s*)/i
+    IMAGE_URL_WITH_CAPTION = /((https?:\/\/|\/)(\S+))(\s+)&quot;(.*?)&quot;/i
+    IMAGE_URL_WITH_CLASS = /(\w+)(\s+)((https?:\/\/|\/)(\S+))/i
+    IMAGE_URL = /((https?:\/\/|\/)(\S+))/i
+    def initialize(tag_name, markup, tokens)
+      super
+      if markup =~ IMAGE_URL_WITH_CLASS_AND_CAPTION_AND_LINK
+        @class   = $1
+        @url     = $3
+        @caption = $7
+        @link = $9
+      elsif markup =~ IMAGE_URL_WITH_CLASS_AND_CAPTION
+        @class   = $1
+        @url     = $3
+        @caption = $7
+      elsif markup =~ IMAGE_URL_WITH_CAPTION
+        @url     = $1
+        @caption = $5
+      elsif markup =~ IMAGE_URL_WITH_CLASS
+        @class = $1
+        @url   = $3
+      elsif markup =~ IMAGE_URL
+        @url = $1
+      end
+    end
+    def render(context)
+      if @class
+        source = &quot;&lt;figure class='#{@class}'&gt;&quot;
+      else
+        source = &quot;&lt;figure&gt;&quot;
+      end
+      if @link
+        source += &quot;&lt;a href=\&quot;#{@link}\&quot;&gt;&quot;
+      end
+      source += &quot;&lt;img src=\&quot;#{@url}\&quot;&gt;&quot;
+      if @link
+        source += &quot;&lt;/a&gt;&quot;
+      end
+      source += &quot;&lt;figcaption&gt;#{@caption}&lt;/figcaption&gt;&quot; if @caption
+      source += &quot;&lt;/figure&gt;&quot;
+      source
+    end
+  end
+end
+Liquid::Template.register_tag('image', Jekyll::ImageTag)
+</code></pre>
+
+<p>is written as this Hugo shortcode:</p>
+
+<pre><code>&lt;!-- image --&gt;
+&lt;figure {{ with .Get &quot;class&quot; }}class=&quot;{{.}}&quot;{{ end }}&gt;
+    {{ with .Get &quot;link&quot;}}&lt;a href=&quot;{{.}}&quot;&gt;{{ end }}
+        &lt;img src=&quot;{{ .Get &quot;src&quot; }}&quot; {{ if or (.Get &quot;alt&quot;) (.Get &quot;caption&quot;) }}alt=&quot;{{ with .Get &quot;alt&quot;}}{{.}}{{else}}{{ .Get &quot;caption&quot; }}{{ end }}&quot;{{ end }} /&gt;
+    {{ if .Get &quot;link&quot;}}&lt;/a&gt;{{ end }}
+    {{ if or (or (.Get &quot;title&quot;) (.Get &quot;caption&quot;)) (.Get &quot;attr&quot;)}}
+    &lt;figcaption&gt;{{ if isset .Params &quot;title&quot; }}
+        {{ .Get &quot;title&quot; }}{{ end }}
+        {{ if or (.Get &quot;caption&quot;) (.Get &quot;attr&quot;)}}&lt;p&gt;
+        {{ .Get &quot;caption&quot; }}
+        {{ with .Get &quot;attrlink&quot;}}&lt;a href=&quot;{{.}}&quot;&gt; {{ end }}
+            {{ .Get &quot;attr&quot; }}
+        {{ if .Get &quot;attrlink&quot;}}&lt;/a&gt; {{ end }}
+        &lt;/p&gt; {{ end }}
+    &lt;/figcaption&gt;
+    {{ end }}
+&lt;/figure&gt;
+&lt;!-- image --&gt;
+</code></pre>
+
+<h3 id="usage">Usage</h3>
+
+<p>I simply changed:</p>
+
+<pre><code>{% image full http://farm5.staticflickr.com/4136/4829260124_57712e570a_o_d.jpg &quot;One of my favorite touristy-type photos. I secretly waited for the good light while we were &quot;having fun&quot; and took this. Only regret: a stupid pole in the top-left corner of the frame I had to clumsily get rid of at post-processing.&quot; -&gt;http://www.flickr.com/photos/alexnormand/4829260124/in/set-72157624547713078/ %}
+</code></pre>
+
+<p>to this (this example uses a slightly extended version named <code>fig</code>, different than the built-in <code>figure</code>):</p>
+
+<pre><code>{{% fig class=&quot;full&quot; src=&quot;http://farm5.staticflickr.com/4136/4829260124_57712e570a_o_d.jpg&quot; title=&quot;One of my favorite touristy-type photos. I secretly waited for the good light while we were having fun and took this. Only regret: a stupid pole in the top-left corner of the frame I had to clumsily get rid of at post-processing.&quot; link=&quot;http://www.flickr.com/photos/alexnormand/4829260124/in/set-72157624547713078/&quot; %}}
+</code></pre>
+
+<p>As a bonus, the shortcode named parameters are, arguably, more readable.</p>
+
+<h2 id="finishing-touches">Finishing touches</h2>
+
+<h3 id="fix-content">Fix content</h3>
+
+<p>Depending on the amount of customization that was done with each post with Jekyll, this step will require more or less effort. There are no hard and fast rules here except that <code>hugo server --watch</code> is your friend. Test your changes and fix errors as needed.</p>
+
+<h3 id="clean-up">Clean up</h3>
+
+<p>You&rsquo;ll want to remove the Jekyll configuration at this point. If you have anything else that isn&rsquo;t used, delete it.</p>
+
+<h2 id="a-practical-example-in-a-diff">A practical example in a diff</h2>
+
+<p><a href="http://heyitsalex.net/">Hey, it&rsquo;s Alex</a> was migrated in less than a <em>father-with-kids day</em> from Jekyll to Hugo. You can see all the changes (and screw-ups) by looking at this <a href="https://github.com/alexandre-normand/alexandre-normand/compare/869d69435bd2665c3fbf5b5c78d4c22759d7613a...b7f6605b1265e83b4b81495423294208cc74d610">diff</a>.</p>
+]]></content>
+		</item>
+		
+	</channel>
+</rss>
