@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Image on Pablo Barajas</title>
-    <link>/tags/image/</link>
-    <description>Recent content in Image on Pablo Barajas</description>
+    <title>demo on Pablo Barajas</title>
+    <link>/tags/demo/</link>
+    <description>Recent content in demo on Pablo Barajas</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
     <lastBuildDate>Mon, 24 Dec 2018 12:29:41 +0800</lastBuildDate>
     
-	<atom:link href="/tags/image/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/tags/demo/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -33,6 +33,15 @@ This theme has 3 CSS classes made for figure elements:
       <description>Just define the image URL in the content’s front matter, the featured image will be displayed as the background.
 For example:
 ---images:-https://picsum.photos/1024/768/?random--- This is an array, you can set multiple urls, only the first url will be used. These images is also used in Twitter Cards and the Open Graph metadata.</description>
+    </item>
+    
+    <item>
+      <title>Typography</title>
+      <link>/posts/typography/</link>
+      <pubDate>Sat, 29 Sep 2018 11:36:33 +0800</pubDate>
+      
+      <guid>/posts/typography/</guid>
+      <description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
     </item>
     
   </channel>
