@@ -3,10 +3,29 @@ layout: post
 title: "About"
 ---
 
-{{< figure src="/posts/Images/pablo.JPG" alt="image" caption="Pablo" class="left" >}}
+{{< figure src="/posts/Images/profilepic.png" alt="image" caption="Pablo" class="left" >}}
 
-I recently completed a Master's Program in Business Analytics from the University of California Irvine.
+I recently completed a Master's Program in Business Analytics from the University of California-Irvine.
 The purpose of this site is to showcase some of my career projects and things related to my career, it is a way to keep a record of the things I do and tings I am interested in.
+
+
+
+
+A little bit about me:
+
+  * Born and raised in Mexico City
+  * I grew up playing competitive tennis
+  * Studied Financial Economics and Mathematics at Brigham Young University-Idaho
+  * Worked in Mexico and the US
+  * I got lucky and married-up, way up
+  * Studied Business Analytics at The University of California-Irvine
+
+
+
+
+
+
+
 
 
 Some of the Certifications and courses I have completed

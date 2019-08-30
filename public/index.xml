@@ -77,29 +77,6 @@ A table:
     </item>
     
     <item>
-      <title>The &#34;figure&#34; Shortcode</title>
-      <link>/posts/the-figure-shortcode/</link>
-      <pubDate>Mon, 24 Dec 2018 12:29:41 +0800</pubDate>
-      
-      <guid>/posts/the-figure-shortcode/</guid>
-      <description>Hugo has figure shortcode built in, so you can easily add figcaptions or hyperlink rel attributes to images. Documentations can be found here:
-https://gohugo.io/content-management/shortcodes/#figure
-This theme has 3 CSS classes made for figure elements:
- big: images will break the width limit of main content area. left: images will float to the left. right: images will float to the right.  If a figure has no class set, the image will behave just like a normal markdown image: !</description>
-    </item>
-    
-    <item>
-      <title>Post With Featured Image</title>
-      <link>/posts/post-with-featured-image/</link>
-      <pubDate>Mon, 01 Oct 2018 16:15:09 +0800</pubDate>
-      
-      <guid>/posts/post-with-featured-image/</guid>
-      <description>Just define the image URL in the content’s front matter, the featured image will be displayed as the background.
-For example:
----images:-https://picsum.photos/1024/768/?random--- This is an array, you can set multiple urls, only the first url will be used. These images is also used in Twitter Cards and the Open Graph metadata.</description>
-    </item>
-    
-    <item>
       <title>Typography</title>
       <link>/posts/typography/</link>
       <pubDate>Sat, 29 Sep 2018 11:36:33 +0800</pubDate>
@@ -117,6 +94,18 @@ For example:
       <description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
 You can embed an R code chunk like this:
 summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about-hugo/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/about-hugo/</guid>
+      <description>Pablo
+  I recently completed a Master&amp;rsquo;s Program in Business Analytics from the University of California-Irvine. The purpose of this site is to showcase some of my career projects and things related to my career, it is a way to keep a record of the things I do and tings I am interested in.
+A little bit about me:
+ Born and raised in Mexico City I grew up playing competitive tennis Studied Financial Economics and Mathematics at Brigham Young University-Idaho Worked in Mexico and the US I got lucky and married-up, way up Studied Business Analytics at The University of California-Irvine  Some of the Certifications and courses I have completed</description>
     </item>
     
   </channel>
