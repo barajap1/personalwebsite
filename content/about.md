@@ -8,9 +8,6 @@ title: "About"
 I recently completed a Master's Program in Business Analytics from the University of California-Irvine.
 The purpose of this site is to showcase some of my career projects and things related to my career, it is a way to keep a record of the things I do and tings I am interested in.
 
-
-
-
 # A little bit about me:
 
     * Born and raised in Mexico City
@@ -23,10 +20,6 @@ The purpose of this site is to showcase some of my career projects and things re
     * I grew up playing competitive tennis and now a weekend player
     * Got into Crossfit a couple years ago
     * I care about energy and waste 
-     
-    
-    
-    
 
 Some of the Certifications and courses I have completed
 
