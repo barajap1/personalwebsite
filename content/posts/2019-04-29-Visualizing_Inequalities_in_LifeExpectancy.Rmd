@@ -3,10 +3,11 @@ title: "Visualizing Inequalities in Life Expectancy"
 author: "Pablo"
 date: 2019-04-29T21:13:14-05:00
 categories: ["R"]
-tags: ["R Markdown", "plot", "graph", "logistic regression"]
+tags: ["R Markdown", "plot"]
 output: 
- html_document:
-    code_folding: hide
+    prettydoc::html_pretty:
+    theme: architect
+    highlight: github
 
 ---
 

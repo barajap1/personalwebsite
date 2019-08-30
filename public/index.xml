@@ -14,11 +14,40 @@
     
     <item>
       <title>Kidney Stones and Simpson&#39;s Paradox</title>
+      <link>/posts/2019-06-29-kidney_stones_simpsons_paradox/</link>
+      <pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-06-29-kidney_stones_simpsons_paradox/</guid>
+      <description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
+    </item>
+    
+    <item>
+      <title>Kidney Stones and Simpson&#39;s Paradox</title>
       <link>/posts/kidney_stones_simpsons_paradox/</link>
       <pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
       
       <guid>/posts/kidney_stones_simpsons_paradox/</guid>
       <description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
+    </item>
+    
+    <item>
+      <title>Gender Bias in Graduate Admissions</title>
+      <link>/posts/2019-05-29-genderbias/</link>
+      <pubDate>Tue, 14 May 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-05-29-genderbias/</guid>
+      <description>BerkeleyIn 1973, The University of California - Berkeley was one of the top-ranked universities in the United States. As such Berkeley attracted thousands of applicants to its graduate school. But how many made the cut?
+We will start off by loading the UCBAdmissions dataset, which is included in base R. This shows the number of students male and female who were admitted or rejected from the six largest departments at Berkeley.</description>
+    </item>
+    
+    <item>
+      <title>Visualizing Inequalities in Life Expectancy</title>
+      <link>/posts/2019-04-29-visualizing_inequalities_in_lifeexpectancy/</link>
+      <pubDate>Mon, 29 Apr 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-04-29-visualizing_inequalities_in_lifeexpectancy/</guid>
+      <description>United Nations life expectancy dataLife expectancy at birth is a measure of the average a living being is expected to live. It takes into account several demographic factors like gender, country, or year of birth.
+Life expectancy at birth can vary along time or between countries because of many causes: the evolution of medicine, the degree of development of countries, or the effect of armed conflicts. Life expectancy varies between gender, as well.</description>
     </item>
     
     <item>
@@ -83,28 +112,6 @@ A table:
       
       <guid>/posts/typography/</guid>
       <description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</description>
-    </item>
-    
-    <item>
-      <title>Hello R Markdown</title>
-      <link>/posts/2015-07-23-r-rmarkdown/</link>
-      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
-      
-      <guid>/posts/2015-07-23-r-rmarkdown/</guid>
-      <description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
-You can embed an R code chunk like this:
-summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/about/</guid>
-      <description>Pablo
-  I recently completed a Master&amp;rsquo;s Program in Business Analytics from the University of California-Irvine. The purpose of this site is to showcase some of my career projects and things related to my career, it is a way to keep a record of the things I do and tings I am interested in.
-A little bit about me: * Born and raised in Mexico City * I became a US Citizen in 2019 * Studied Financial Economics and Mathematics at Brigham Young University-Idaho * Studied Business Analytics at The University of California-Irvine * Worked in Mexico and the US * I got lucky and married-up, way up * I cannot stand onions * I grew up playing competitive tennis and now a weekend player * Got into Crossfit a couple years ago * I care about energy and waste  Some of the Certifications and courses I have completed</description>
     </item>
     
   </channel>

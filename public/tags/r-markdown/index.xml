@@ -14,11 +14,40 @@
     
     <item>
       <title>Kidney Stones and Simpson&#39;s Paradox</title>
+      <link>/posts/2019-06-29-kidney_stones_simpsons_paradox/</link>
+      <pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-06-29-kidney_stones_simpsons_paradox/</guid>
+      <description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
+    </item>
+    
+    <item>
+      <title>Kidney Stones and Simpson&#39;s Paradox</title>
       <link>/posts/kidney_stones_simpsons_paradox/</link>
       <pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
       
       <guid>/posts/kidney_stones_simpsons_paradox/</guid>
       <description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
+    </item>
+    
+    <item>
+      <title>Gender Bias in Graduate Admissions</title>
+      <link>/posts/2019-05-29-genderbias/</link>
+      <pubDate>Tue, 14 May 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-05-29-genderbias/</guid>
+      <description>BerkeleyIn 1973, The University of California - Berkeley was one of the top-ranked universities in the United States. As such Berkeley attracted thousands of applicants to its graduate school. But how many made the cut?
+We will start off by loading the UCBAdmissions dataset, which is included in base R. This shows the number of students male and female who were admitted or rejected from the six largest departments at Berkeley.</description>
+    </item>
+    
+    <item>
+      <title>Visualizing Inequalities in Life Expectancy</title>
+      <link>/posts/2019-04-29-visualizing_inequalities_in_lifeexpectancy/</link>
+      <pubDate>Mon, 29 Apr 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-04-29-visualizing_inequalities_in_lifeexpectancy/</guid>
+      <description>United Nations life expectancy dataLife expectancy at birth is a measure of the average a living being is expected to live. It takes into account several demographic factors like gender, country, or year of birth.
+Life expectancy at birth can vary along time or between countries because of many causes: the evolution of medicine, the degree of development of countries, or the effect of armed conflicts. Life expectancy varies between gender, as well.</description>
     </item>
     
     <item>

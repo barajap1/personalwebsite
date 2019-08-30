@@ -1,0 +1,507 @@
+---
+title: "Gender Bias in Graduate Admissions"
+author: "Pablo"
+date: 2019-05-14T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot"]
+output:
+  html_document:
+    code_folding: hide
+---
+
+
+
+<div id="berkeley" class="section level2">
+<h2>Berkeley</h2>
+<p>In 1973, The University of California - Berkeley was one of the top-ranked universities in the United States. As such Berkeley attracted thousands of applicants to its graduate school. But how many made the cut?</p>
+<p>We will start off by loading the <code>UCBAdmissions</code> dataset, which is included in base R. This shows the number of students male and female who were admitted or rejected from the six largest departments at Berkeley. Since the dataset takes the unwieldly form of a three-dimensional array, we will convert it to tidy format using the <code>tidy</code> function from the <code>tidytext</code> package. Then we will be ready to start doing some analysis.</p>
+<p><img src="Images/UCB.png" /></p>
+<pre class="r"><code># Loading UCBAdmissions dataset
+data(UCBAdmissions)</code></pre>
+<p>Printing the dataset to the console:</p>
+<table style="width:88%;">
+<colgroup>
+<col width="15%" />
+<col width="12%" />
+<col width="9%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+<col width="8%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td></td>
+<td></td>
+<td align="center">Dept</td>
+<td align="center">A</td>
+<td align="center">B</td>
+<td align="center">C</td>
+<td align="center">D</td>
+<td align="center">E</td>
+<td align="center">F</td>
+</tr>
+<tr class="even">
+<td>Admit</td>
+<td>Gender</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+<tr class="odd">
+<td>Admitted</td>
+<td>Male</td>
+<td align="center"></td>
+<td align="center">512</td>
+<td align="center">353</td>
+<td align="center">120</td>
+<td align="center">138</td>
+<td align="center">53</td>
+<td align="center">22</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Female</td>
+<td align="center"></td>
+<td align="center">89</td>
+<td align="center">17</td>
+<td align="center">202</td>
+<td align="center">131</td>
+<td align="center">94</td>
+<td align="center">24</td>
+</tr>
+<tr class="odd">
+<td>Rejected</td>
+<td>Male</td>
+<td align="center"></td>
+<td align="center">313</td>
+<td align="center">207</td>
+<td align="center">205</td>
+<td align="center">279</td>
+<td align="center">138</td>
+<td align="center">351</td>
+</tr>
+<tr class="even">
+<td></td>
+<td>Female</td>
+<td align="center"></td>
+<td align="center">19</td>
+<td align="center">8</td>
+<td align="center">391</td>
+<td align="center">244</td>
+<td align="center">299</td>
+<td align="center">317</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Loading broom package
+library(broom)
+
+# Converting UCBAdmissions to tidy format
+ucb_tidy &lt;- tidy(UCBAdmissions)</code></pre>
+<p>Printing the dataset to the console:</p>
+<table style="width:47%;">
+<colgroup>
+<col width="15%" />
+<col width="12%" />
+<col width="9%" />
+<col width="9%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Admit</th>
+<th align="center">Gender</th>
+<th align="center">Dept</th>
+<th align="center">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Male</td>
+<td align="center">A</td>
+<td align="center">512</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Male</td>
+<td align="center">A</td>
+<td align="center">313</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Female</td>
+<td align="center">A</td>
+<td align="center">89</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Female</td>
+<td align="center">A</td>
+<td align="center">19</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Male</td>
+<td align="center">B</td>
+<td align="center">353</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Male</td>
+<td align="center">B</td>
+<td align="center">207</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Female</td>
+<td align="center">B</td>
+<td align="center">17</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Female</td>
+<td align="center">B</td>
+<td align="center">8</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Male</td>
+<td align="center">C</td>
+<td align="center">120</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Male</td>
+<td align="center">C</td>
+<td align="center">205</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Female</td>
+<td align="center">C</td>
+<td align="center">202</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Female</td>
+<td align="center">C</td>
+<td align="center">391</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Male</td>
+<td align="center">D</td>
+<td align="center">138</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Male</td>
+<td align="center">D</td>
+<td align="center">279</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Female</td>
+<td align="center">D</td>
+<td align="center">131</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Female</td>
+<td align="center">D</td>
+<td align="center">244</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Male</td>
+<td align="center">E</td>
+<td align="center">53</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Male</td>
+<td align="center">E</td>
+<td align="center">138</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Female</td>
+<td align="center">E</td>
+<td align="center">94</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Female</td>
+<td align="center">E</td>
+<td align="center">299</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Male</td>
+<td align="center">F</td>
+<td align="center">22</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Male</td>
+<td align="center">F</td>
+<td align="center">351</td>
+</tr>
+<tr class="odd">
+<td align="center">Admitted</td>
+<td align="center">Female</td>
+<td align="center">F</td>
+<td align="center">24</td>
+</tr>
+<tr class="even">
+<td align="center">Rejected</td>
+<td align="center">Female</td>
+<td align="center">F</td>
+<td align="center">317</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="acceptance-rate-for-men-and-women" class="section level2">
+<h2>Acceptance rate for men and women</h2>
+<p>The data is more readable now that it is in tidy format, but since it is split by department and displays raw counts, it is difficult for us to infer any kind of gender bias. To do that, we need to aggregate over department and ask ourselves, overall, what proportion of men and women were accepted into Berkeley in 1973.</p>
+<p>Here we make use of the <code>dplyr</code> package for all of our data manipulation tasks. We aggregate over department using the <code>group_by</code> function to get the total number of men and women who were accepted into or rejected from Berkeley that year, as well as the proportion accepted in each case. That will leave us in a better place to understand any accusations of gender bias.</p>
+<pre class="r"><code># Loading the dplyr library
+library(dplyr)
+
+# Aggregate over department
+ucb_tidy_aggregated &lt;- ucb_tidy %&gt;% 
+  group_by(Admit, Gender) %&gt;% 
+  summarize(n = sum(n)) %&gt;% 
+  ungroup() %&gt;% 
+  group_by(Gender) %&gt;% 
+  mutate(prop = n/sum(n)) %&gt;% 
+  filter(Admit == &quot;Admitted&quot;)
+
+# Print aggregated dataset
+ucb_tidy_aggregated</code></pre>
+<pre><code>## # A tibble: 2 x 4
+## # Groups:   Gender [2]
+##   Admit    Gender     n  prop
+##   &lt;chr&gt;    &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 Admitted Female   557 0.304
+## 2 Admitted Male    1198 0.445</code></pre>
+</div>
+<div id="visualizing-the-discrepancy" class="section level2">
+<h2>Visualizing the discrepancy</h2>
+<p>From the previous task, we can see that <em>44.5% of male applicants</em> were accepted into Berkeley, as opposed to <em>30.4% of female applicants.</em> Now we can start to see the problem. Did Berkeley’s graduate admissions department really discriminate against women in 1973?</p>
+<p>Before we consider alternative explanations, let’s visualize the discrepancy through a simple bar chart using <code>ggplot2</code>. This won’t add much to our understanding of the problem right now, but it will act as a useful reference point later on.</p>
+<p>For clarity, we will format acceptance rate as a percentage using the percent function from the <code>scales</code> package.</p>
+<pre class="r"><code># Load the ggplot2 and scales packages
+library(ggplot2)
+library(scales)
+
+# Prepare the bar plot
+gg_bar &lt;- ucb_tidy_aggregated %&gt;% 
+    ggplot(aes(x = Gender, y = prop, fill = Gender)) +
+    geom_col() +
+    geom_text(aes(label = percent(prop)), vjust = -1) +
+    labs(title = &quot;Acceptance rate of male and female applicants&quot;,
+         subtitle = &quot;University of California, Berkeley (1973)&quot;,
+         y = &quot;Acceptance rate&quot;) +
+    scale_y_continuous(labels = percent, limits = c(0,0.5)) +
+    guides(fill = FALSE)
+
+# Print the bar plot
+print(gg_bar)</code></pre>
+<p><img src="/posts/2019-05-29-GenderBias_files/figure-html/fig1-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="acceptance-rate-by-department" class="section level2">
+<h2>Acceptance rate by department</h2>
+<p>The bar plot confirms what we already knew, a higher proportion of men were accepted than women. But what happens when we separate the graph out by department?</p>
+<p>Now we can return to our <code>ucb_tidy</code> dataset. After calculating the proportion of acceptances/rejections, we will plot a separate chart for each department using the <code>facet_wrap()</code> function in <code>ggplot2</code> This will give us an idea of how acceptance rates differ by department, as well as by gender.</p>
+<pre class="r"><code># Calculate acceptance/rejection rate
+ucb_by_dept &lt;- ucb_tidy %&gt;% 
+    group_by(Gender, Dept) %&gt;% 
+    mutate(prop = n/sum(n)) %&gt;% 
+    filter(Admit == &quot;Admitted&quot;)
+
+# Print the dataset
+print(ucb_by_dept)</code></pre>
+<pre><code>## # A tibble: 12 x 5
+## # Groups:   Gender, Dept [12]
+##    Admit    Gender Dept      n   prop
+##    &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Admitted Male   A       512 0.621 
+##  2 Admitted Female A        89 0.824 
+##  3 Admitted Male   B       353 0.630 
+##  4 Admitted Female B        17 0.68  
+##  5 Admitted Male   C       120 0.369 
+##  6 Admitted Female C       202 0.341 
+##  7 Admitted Male   D       138 0.331 
+##  8 Admitted Female D       131 0.349 
+##  9 Admitted Male   E        53 0.277 
+## 10 Admitted Female E        94 0.239 
+## 11 Admitted Male   F        22 0.0590
+## 12 Admitted Female F        24 0.0704</code></pre>
+<pre class="r"><code># Prepare the bar plot for each department
+gg_bar_faceted &lt;- ucb_by_dept %&gt;% 
+  ggplot(aes(Gender, prop, fill = Gender)) +
+  geom_col() +
+  geom_text(aes(label = percent(prop)), vjust = -1) +
+  labs(title = &quot;Acceptance rate of male and female applicants&quot;,
+       subtitle = &quot;University of California, Berkeley (1973)&quot;,
+       y = &quot;Acceptance rate&quot;) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  facet_wrap(~Dept)  +
+  guides(fill = FALSE)
+
+# Print the bar plot for each department
+print(gg_bar_faceted)</code></pre>
+<p><img src="/posts/2019-05-29-GenderBias_files/figure-html/fig2-1.png" width="672" style="display: block; margin: auto;" />
+## Alternative explanations
+Now that we have separated out our analysis by department, the interpretation has changed rather dramatically. Although men were indeed more likely to be admitted into Departments C and E, women were more likely to be admitted into all other departments. So what’s really going on here?</p>
+<p>If you turn your attention to the first two plots, you can see that Department A and B were quite easy to get into. However, relatively few women applied to these departments – only 108 women applied to Department A, as opposed to 825 men!</p>
+<p>At this stage, we can hypothesise that the effect of gender on acceptance is null when you control for department. We can test that hypothesis using <strong>binary logistic regression,</strong> but first we need to de-aggregate the dataset so that each row represents one student. That should leave us with 4,526 rows – one row for each student who applied to Berkeley that year.</p>
+<pre class="r"><code># Define function that repeats each row in each column n times
+multiply_rows &lt;- function(column, n) {
+  rep(column, n)
+}
+
+# Create new de-aggregated data frame using the multiply_rows function
+ucb_full &lt;- data.frame(Admit = multiply_rows(ucb_tidy$Admit, ucb_tidy$n),
+                      Gender = multiply_rows(ucb_tidy$Gender, ucb_tidy$n),
+                      Dept = multiply_rows(ucb_tidy$Dept, ucb_tidy$n))
+
+# Check the number of rows equals the number of students
+nrow(ucb_full)</code></pre>
+<pre><code>## [1] 4526</code></pre>
+</div>
+<div id="binary-logistic-regression-part-i" class="section level2">
+<h2>Binary logistic regression: part i</h2>
+<p>The data is now in the right format for us to do some hypothesis testing. Great! But first let’s try to predict admittance using gender alone. We will use the built-in <code>glm()</code> function to fit a generalised linear model, making sure to set <code>family = "binomial"</code> because the outcome variable is binary (<code>Admitted</code> or <code>Rejected</code>).</p>
+<p>By default, Admit is coded such that Admitted is level 1 and Rejected is level 2 (because of their alphabetical order). Since glm() will assume that level 2 represents ‘success’, we will reverse the coding of Admit so we are predicting the probability of admittance rather than rejection.</p>
+<p>To change the coding of a variable, you can use the <code>fct_relevel()</code> function from the <code>forcats</code> package.</p>
+<pre class="r"><code># Load the forcats library
+library(forcats)
+
+# Reverse the coding of the Admit variable
+ucb_full$Admit &lt;- fct_relevel(ucb_full$Admit, &quot;Rejected&quot;, &quot;Admitted&quot;)
+
+# Run the regression
+glm_gender &lt;- glm(Admit ~ Gender, data = ucb_full, family = &quot;binomial&quot;)
+
+# Summarize the results
+summary(glm_gender)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Admit ~ Gender, family = &quot;binomial&quot;, data = ucb_full)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.0855  -1.0855  -0.8506   1.2722   1.5442  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -0.83049    0.05077 -16.357   &lt;2e-16 ***
+## GenderMale   0.61035    0.06389   9.553   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 6044.3  on 4525  degrees of freedom
+## Residual deviance: 5950.9  on 4524  degrees of freedom
+## AIC: 5954.9
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div id="binary-logistic-regression-part-ii" class="section level2">
+<h2>Binary logistic regression: part ii</h2>
+<p>Sure enough, when you predict the probability of admission as a function of gender alone, the effect is statistically significant (p &lt; 0.01). Specifically, you are <code>exp(0.61035) = 1.84</code> times more likely to be admitted if you are a man. However, what happens if we control for department?</p>
+<pre class="r"><code># Run the regression, including Dept as an explanatory variable
+glm_genderdept &lt;- glm(Admit ~ Gender + Dept, data = ucb_full, family = &quot;binomial&quot;)
+
+# Summarize the results
+summary(glm_genderdept)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Admit ~ Gender + Dept, family = &quot;binomial&quot;, data = ucb_full)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4773  -0.9306  -0.3741   0.9588   2.3613  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.68192    0.09911   6.880 5.97e-12 ***
+## GenderMale  -0.09987    0.08085  -1.235    0.217    
+## DeptB       -0.04340    0.10984  -0.395    0.693    
+## DeptC       -1.26260    0.10663 -11.841  &lt; 2e-16 ***
+## DeptD       -1.29461    0.10582 -12.234  &lt; 2e-16 ***
+## DeptE       -1.73931    0.12611 -13.792  &lt; 2e-16 ***
+## DeptF       -3.30648    0.16998 -19.452  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 6044.3  on 4525  degrees of freedom
+## Residual deviance: 5187.5  on 4519  degrees of freedom
+## AIC: 5201.5
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+</div>
+<div id="behold-simpsons-paradox" class="section level2">
+<h2>Behold Simpson’s paradox</h2>
+<p>Finally, we can see Simpson’s paradox at play – when you control for the effect of department on the probability of admission, the effect of gender disappears. In fact, it even reverses, suggesting that – controlling for department – you were actually more likely to be admitted as a woman! However, this effect is not statistically significant (p &gt; 0.05), so we conclude that there was not a campus-wide bias against applicants of either gender in 1973.</p>
+<p>That said, individual departments often handle their own admissions processes, so it is plausible that bias exists in one department but not another. Let’s take a look at Department A, where 82.4% of women were admitted but only 62.1% of men. Is the difference statistically significant?</p>
+<pre class="r"><code># Filter for Department A
+dept_a &lt;- ucb_full %&gt;% filter(Dept == &quot;A&quot;)
+
+# Run the regression
+glm_gender_depta &lt;- glm(Admit ~ Gender, data = dept_a, family = &quot;binomial&quot;)
+
+# Summarize the results
+summary(glm_gender_depta)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Admit ~ Gender, family = &quot;binomial&quot;, data = dept_a)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.8642  -1.3922   0.9768   0.9768   0.9768  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   1.5442     0.2527   6.110 9.94e-10 ***
+## GenderMale   -1.0521     0.2627  -4.005 6.21e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1214.7  on 932  degrees of freedom
+## Residual deviance: 1195.7  on 931  degrees of freedom
+## AIC: 1199.7
+## 
+## Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div id="bias-or-discrimination" class="section level2">
+<h2>Bias or discrimination?</h2>
+<p>Well then! If we take Department A in isolation, we find there is a statistically significant bias in favour of women. So does that mean that the department discriminated against men?</p>
+<p>Not necessarily. After all, the bias might exist simply because the female applicants to Department A were better qualified that year. In their article dealing with this issue, Bickel, Hammel &amp; O’Connell (1975) define discrimination as “the exercise of decision influenced by the sex of the applicant when that is immaterial to the qualifications for entry”. Since we do not have any data on the respective qualifications of the candidates, we cannot say whether any gender bias in their admissions process amounted to discrimination.</p>
+<p>Although now more than 40 years old, the Berkeley problem is a useful reminder about the dangers of aggregation and omitted variable bias, especially in relation to matters of such legal and ethical importance as discrimination. Where bias does exist – as it does in the case of Department A – it is always worth considering whether there are any other factors that could explain the discrepancy.</p>
+<pre class="r"><code># Define bias
+bias &lt;- &quot;A pattern of association between a particular decision and a particular sex of applicant, of sufficient strength to make us confident that it is unlikely to be the result of chance alon&quot;
+
+# Define discrimination
+discrimination &lt;- &quot;The exercise of decision influenced by the sex of the applicant when that is immaterial to the qualifications for entry&quot;
+
+# Is bias equal to discrimination?
+bias == discrimination</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>This project was completed as part of Datacamp projects</p>
+</div>

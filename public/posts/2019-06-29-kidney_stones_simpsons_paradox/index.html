@@ -22,7 +22,7 @@
 <meta property="og:title" content="Kidney Stones and Simpson&#39;s Paradox" />
 <meta property="og:description" content="1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="/posts/kidney_stones_simpsons_paradox/" />
+<meta property="og:url" content="/posts/2019-06-29-kidney_stones_simpsons_paradox/" />
 <meta property="article:published_time" content="2019-06-29T21:13:14-05:00"/>
 <meta property="article:modified_time" content="2019-06-29T21:13:14-05:00"/>
 <meta name="twitter:card" content="summary"/>
@@ -257,7 +257,7 @@ pander(sum_data)</code></pre>
 sum_data %&gt;%
   ggplot(aes(x = treatment, y = N)) + 
   geom_bar(aes(fill = stone_size), stat=&quot;identity&quot;) </code></pre>
-<p><img src="/posts/Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/posts/2019-06-29-Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="identify-and-confirm-the-lurking-variable" class="section level2">
 <h2>5. Identify and confirm the lurking variable</h2>
@@ -341,7 +341,7 @@ tidy_m %&gt;%
   geom_pointrange(aes(ymin = estimate - 1.96 * std.error, 
                       ymax = estimate + 1.96 * std.error)) +
   geom_hline(yintercept = 0)</code></pre>
-<p><img src="/posts/Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="/posts/2019-06-29-Kidney_stones_simpsons_paradox_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="generating-insights" class="section level2">
 <h2>8. Generating insights</h2>
@@ -364,11 +364,8 @@ tidy_m %&gt;%
 			</footer>
 		</article>
 		<div class="post-nav thin">
-			<a class="next-post" href="/posts/2019-06-29-kidney_stones_simpsons_paradox/">
-				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Kidney Stones and Simpson&#39;s Paradox</span>
-			</a>
-			<a class="prev-post" href="/posts/2019-05-29-genderbias/">
-				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Gender Bias in Graduate Admissions</span>
+			<a class="prev-post" href="/posts/kidney_stones_simpsons_paradox/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Kidney Stones and Simpson&#39;s Paradox</span>
 			</a>
 		</div>
 		<div id="comments" class="thin">
