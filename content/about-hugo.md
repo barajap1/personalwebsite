@@ -14,21 +14,15 @@ The purpose of this site is to showcase some of my career projects and things re
 A little bit about me:
 
   * Born and raised in Mexico City
-  * I grew up playing competitive tennis
+  * I became a US Citizen in 2019
   * Studied Financial Economics and Mathematics at Brigham Young University-Idaho
+  * Studied Business Analytics at The University of California-Irvine
   * Worked in Mexico and the US
   * I got lucky and married-up, way up
-  * I became a US Citizen in 2019
   * I cannot stand onions
-  * Studied Business Analytics at The University of California-Irvine
-
-
-
-
-
-
-
-
+  * I grew up playing competitive tennis and  now a weekend player
+  * 
+  * 
 
 Some of the Certifications and courses I have completed
 
