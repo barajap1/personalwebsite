@@ -3,8 +3,11 @@ layout: post
 title: "About"
 ---
 
+{{< figure src="/posts/Images/pablo.JPG" alt="image" caption="Pablo" class="left" >}}
+
 I recently completed a Master's Program in Business Analytics from the University of California Irvine.
 The purpose of this site is to showcase some of my career projects and things related to my career, it is a way to keep a record of the things I do and tings I am interested in.
+
 
 Some of the Certifications and courses I have completed
 
@@ -17,6 +20,7 @@ Some of the Certifications and courses I have completed
 [Data Scientist with R- over 100 hours of R programming](https://www.datacamp.com/statement-of-accomplishment/track/be53be5d2dd8f92ba0867cabf785e7c48452dffe)
 
 [R Programming Track](https://www.datacamp.com/statement-of-accomplishment/track/ab0aa8dd88cd8934a208039f78204d09f6094f7e)
+
 
 ## Python
 
