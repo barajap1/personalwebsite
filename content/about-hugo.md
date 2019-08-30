@@ -18,6 +18,8 @@ A little bit about me:
   * Studied Financial Economics and Mathematics at Brigham Young University-Idaho
   * Worked in Mexico and the US
   * I got lucky and married-up, way up
+  * I became a US Citizen in 2019
+  * I cannot stand onions
   * Studied Business Analytics at The University of California-Irvine
 
 
