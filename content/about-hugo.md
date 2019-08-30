@@ -23,8 +23,8 @@ The purpose of this site is to showcase some of my career projects and things re
     * I grew up playing competitive tennis and now a weekend player
     * Got into Crossfit a couple years ago
     * I care about energy and waste 
-    * 
-    *
+     
+    
     
     
 
