@@ -11,7 +11,7 @@ The purpose of this site is to showcase some of my career projects and things re
 
 
 
-A little bit about me:
+# A little bit about me:
 
     * Born and raised in Mexico City
     * I became a US Citizen in 2019
@@ -20,9 +20,10 @@ A little bit about me:
     * Worked in Mexico and the US
     * I got lucky and married-up, way up
     * I cannot stand onions
-    * I grew up playing competitive tennis and  now a weekend player
+    * I grew up playing competitive tennis and now a weekend player
+    * Got into Crossfit a couple years ago
+    * I care about energy and waste 
     * 
-    *  
     *
     
     
