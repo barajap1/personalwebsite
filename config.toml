@@ -34,9 +34,9 @@ googleAnalytics = "UA-147148594-1"
   # Metadata mostly used in document's head
   # description = ""
   # images = [""]
-  themeColor = "#494f5c"
+  themeColor = "#818ba1"
 
-  homeSubtitle = "A personal site for proffesional projects and interests"
+  homeSubtitle = "A personal site for professional projects and interests"
   footerCopyright = ' &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
   # bgImg = ""  # Homepage background-image URL
 
