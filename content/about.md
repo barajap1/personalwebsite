@@ -6,7 +6,7 @@ title: "About"
 {{< figure src="/posts/Images/profilepic.png" alt="image" caption="Pablo" class="left" >}}
 
 I recently completed a Master's Program in Business Analytics from the University of California-Irvine.
-The purpose of this site is to showcase some of my career projects and things related to my career, it is a way to keep a record of the things I do and tings I am interested in.
+The purpose of this site is to showcase some of my career projects and professional interests and the ocasional random thing, it is a way to keep a record of the things I do and tings I am interested in.
 
 # A little bit about me:
 
@@ -17,11 +17,14 @@ The purpose of this site is to showcase some of my career projects and things re
     * Worked in Mexico and the US
     * I got lucky and married-up, way up
     * I cannot stand onions
-    * I grew up playing competitive tennis and now a weekend player
+    * I grew up playing competitive tennis and now I am a passionate weekend player
     * Got into Crossfit a couple years ago
     * I care about energy and waste 
 
 Some of the Certifications and courses I have completed
+-
+-
+
 
 ## Certifications
 

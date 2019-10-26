@@ -34,7 +34,7 @@ googleAnalytics = "UA-147148594-1"
   # Metadata mostly used in document's head
   # description = ""
   # images = [""]
-  themeColor = "#818ba1"
+  themeColor = "#818ba1" #original color"#494f5c"
 
   homeSubtitle = "A personal site for professional projects and interests"
   footerCopyright = ' &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>'
@@ -74,12 +74,14 @@ googleAnalytics = "UA-147148594-1"
     url = "posts/"
     weight = 10
 
-  [[menu.main]]
-    name = "About"
-    url = "about-hugo/"
-    weight = 20
-  
    [[menu.main]]
     name = "Blog"
     url = "blog/"
-    weight = 30 
+    weight = 20 
+
+  [[menu.main]]
+    name = "About"
+    url = "about-hugo/"
+    weight = 30
+  
+
