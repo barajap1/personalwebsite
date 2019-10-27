@@ -1,13 +1,10 @@
 ---
 title: "Hans Rosling - Bubble Chart"
 author: "Pablo"
-date: 2019-10-26T21:12:54-05:00
+date: "10/26/2019"
 categories: ["R"]
 tags: ["R Markdown", "plot"]
-output: 
-    prettydoc::html_pretty:
-    theme: architect
-    highlight: github
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
