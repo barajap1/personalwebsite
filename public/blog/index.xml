@@ -40,7 +40,7 @@
       
       <guid>/blog/2019-04-19-markdown/</guid>
       <description>Inline styles：
-strong, emphasis, strong and emphasis,code, underline, strikethrough, 😂🤣, $\LaTeX$, $$X^2$$, H~2~O, ==highlight==, Link
+strong, emphasis, strong and emphasis,code, underline, strikethrough, 😂🤣, Link
 Headings:
 Heading 1 Heading 2 Heading 3 Heading 4 Heading 5 Heading 6 Here&amp;rsquo;s some basic text.
 And here&amp;rsquo;s some italics
@@ -48,7 +48,8 @@ Here&amp;rsquo;s some bold text.
 What about a link?
 Here&amp;rsquo;s a bulleted list:
  First item Second item Third item  Here&amp;rsquo;s a numbered list:
- First Second Third  Here&amp;rsquo;s an unordered list:</description>
+ First Second Third  Here&amp;rsquo;s an unordered list:
+ Unordered list item 1.</description>
     </item>
     
   </channel>
