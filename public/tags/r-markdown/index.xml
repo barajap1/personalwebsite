@@ -7,10 +7,29 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Sat, 29 Jun 2019 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 26 Oct 2019 21:14:14 -0500</lastBuildDate>
     
 	<atom:link href="/tags/r-markdown/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Simpsons by Gil Henriques</title>
+      <link>/posts/2019-10-26-simpsons_by_gilhenriques/</link>
+      <pubDate>Sat, 26 Oct 2019 21:14:14 -0500</pubDate>
+      
+      <guid>/posts/2019-10-26-simpsons_by_gilhenriques/</guid>
+      <description>library(tidyverse)library(showtext) # for google fontsfont_add_google(&amp;quot;Gaegu&amp;quot;, &amp;quot;gaegu&amp;quot;)showtext_auto()# Read and prepare data ---------------------------------------------------df &amp;lt;- read_delim(&amp;quot;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-08-27/simpsons-guests.csv&amp;quot;, delim = &amp;quot;|&amp;quot;, quote = &amp;quot;&amp;quot;)df2 &amp;lt;- df %&amp;gt;% mutate(number = strsplit(as.character(number), &amp;quot;; &amp;quot;)) %&amp;gt;% unnest() %&amp;gt;% # Splits rows that contain multiple episodes into multiple rowsgroup_by(season) %&amp;gt;% summarize(guests_per_episode = n_distinct(guest_star)/n_distinct(number))# Prepare for plot --------------------------------------------------------# I want the axes and the line connecting the points to look hand-drawn, so I will use geom_line + jitter to draw themspline_int &amp;lt;- as.</description>
+    </item>
+    
+    <item>
+      <title>Hans Rosling - Bubble Chart</title>
+      <link>/posts/2019-10-26-hans_rosling_bubble_chart/</link>
+      <pubDate>Sat, 26 Oct 2019 21:13:14 -0500</pubDate>
+      
+      <guid>/posts/2019-10-26-hans_rosling_bubble_chart/</guid>
+      <description>R MarkdownWhen I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
+  # libraries neededlibrary(tidyverse)library(ggplot2)library(viridis)library(gganimate)library(wbstats)# pull the country data down from the World Bank - three indicatorswbstats::wb(indicator = c(&amp;quot;SP.DYN.LE00.IN&amp;quot;, &amp;quot;NY.GDP.PCAP.CD&amp;quot;, &amp;quot;SP.POP.TOTL&amp;quot;), country = &amp;quot;countries_only&amp;quot;, startdate = 1960, enddate = 2018) %&amp;gt;% # pull down mapping of countries to regions and joindplyr::left_join(wbstats::wbcountries() %&amp;gt;% dplyr::select(iso3c, region)) %&amp;gt;% # spread the three indicatorstidyr::pivot_wider(id_cols = c(&amp;quot;date&amp;quot;, &amp;quot;country&amp;quot;, &amp;quot;region&amp;quot;), names_from = indicator, values_from = value) %&amp;gt;% # plot the dataggplot2::ggplot(aes(x = log(`GDP per capita (current US$)`), y = `Life expectancy at birth, total (years)`,size = `Population, total`)) +ggplot2::geom_point(alpha = 0.</description>
+    </item>
     
     <item>
       <title>Kidney Stones and Simpson&#39;s Paradox</title>
@@ -18,15 +37,6 @@
       <pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
       
       <guid>/posts/2019-06-29-kidney_stones_simpsons_paradox/</guid>
-      <description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
-    </item>
-    
-    <item>
-      <title>Kidney Stones and Simpson&#39;s Paradox</title>
-      <link>/posts/kidney_stones_simpsons_paradox/</link>
-      <pubDate>Sat, 29 Jun 2019 21:13:14 -0500</pubDate>
-      
-      <guid>/posts/kidney_stones_simpsons_paradox/</guid>
       <description>1. A new look at an old research studyIn 1986, a group of urologists in London published a research paper in The British Medical Journal that compared the effectiveness of two different methods to remove kidney stones. Treatment A was open surgery (invasive), and treatment B was percutaneous nephrolithotomy (less invasive). When they looked at the results from 700 patients, treatment B had a higher success rate. However, when they only looked at the subgroup of patients different kidney stone sizes, treatment A had a better success rate.</description>
     </item>
     
@@ -66,17 +76,6 @@ Life expectancy at birth can vary along time or between countries because of man
       
       <guid>/posts/2019-03-13-amazon-network-analysis/</guid>
       <description>Amazon Network Analysis# Load relevant packageslibrary(car)library(dplyr)library(tidyr)library(igraph)library(ggplot2)library(corrplot)head(products)## id title## 1 1 Patterns of Preaching: A Sermon Sampler## 2 2 Candlemas: Feast of Flames## 3 3 World War II Allied Fighter Planes Trading Cards## 4 4 Life Application Bible Commentary: 1 and 2 Timothy and Titus## 5 5 Prayers That Avail Much for Business: Executive## 6 6 How the Other Half Lives: Studies Among the Tenements of New York## group salesrank review_cnt downloads rating## 1 Book 396585 2 2 5.</description>
-    </item>
-    
-    <item>
-      <title>Hello R Markdown</title>
-      <link>/posts/2015-07-23-r-rmarkdown/</link>
-      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
-      
-      <guid>/posts/2015-07-23-r-rmarkdown/</guid>
-      <description>R MarkdownThis is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
-You can embed an R code chunk like this:
-summary(cars)## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
     </item>
     
   </channel>

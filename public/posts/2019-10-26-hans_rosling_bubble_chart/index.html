@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="theme-color" content="#818ba1">
+	<meta name="msapplication-TileColor" content="#818ba1">
+
+<meta itemprop="name" content="Hans Rosling - Bubble Chart">
+<meta itemprop="description" content="R MarkdownWhen I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
+  # libraries neededlibrary(tidyverse)library(ggplot2)library(viridis)library(gganimate)library(wbstats)# pull the country data down from the World Bank - three indicatorswbstats::wb(indicator = c(&quot;SP.DYN.LE00.IN&quot;, &quot;NY.GDP.PCAP.CD&quot;, &quot;SP.POP.TOTL&quot;), country = &quot;countries_only&quot;, startdate = 1960, enddate = 2018) %&gt;% # pull down mapping of countries to regions and joindplyr::left_join(wbstats::wbcountries() %&gt;% dplyr::select(iso3c, region)) %&gt;% # spread the three indicatorstidyr::pivot_wider(id_cols = c(&quot;date&quot;, &quot;country&quot;, &quot;region&quot;), names_from = indicator, values_from = value) %&gt;% # plot the dataggplot2::ggplot(aes(x = log(`GDP per capita (current US$)`), y = `Life expectancy at birth, total (years)`,size = `Population, total`)) &#43;ggplot2::geom_point(alpha = 0.">
+
+
+<meta itemprop="datePublished" content="2019-10-26T21:13:14-05:00" />
+<meta itemprop="dateModified" content="2019-10-26T21:13:14-05:00" />
+<meta itemprop="wordCount" content="221">
+
+
+
+<meta itemprop="keywords" content="R Markdown,plot," />
+<meta property="og:title" content="Hans Rosling - Bubble Chart" />
+<meta property="og:description" content="R MarkdownWhen I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
+  # libraries neededlibrary(tidyverse)library(ggplot2)library(viridis)library(gganimate)library(wbstats)# pull the country data down from the World Bank - three indicatorswbstats::wb(indicator = c(&quot;SP.DYN.LE00.IN&quot;, &quot;NY.GDP.PCAP.CD&quot;, &quot;SP.POP.TOTL&quot;), country = &quot;countries_only&quot;, startdate = 1960, enddate = 2018) %&gt;% # pull down mapping of countries to regions and joindplyr::left_join(wbstats::wbcountries() %&gt;% dplyr::select(iso3c, region)) %&gt;% # spread the three indicatorstidyr::pivot_wider(id_cols = c(&quot;date&quot;, &quot;country&quot;, &quot;region&quot;), names_from = indicator, values_from = value) %&gt;% # plot the dataggplot2::ggplot(aes(x = log(`GDP per capita (current US$)`), y = `Life expectancy at birth, total (years)`,size = `Population, total`)) &#43;ggplot2::geom_point(alpha = 0." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/2019-10-26-hans_rosling_bubble_chart/" />
+<meta property="article:published_time" content="2019-10-26T21:13:14-05:00"/>
+<meta property="article:modified_time" content="2019-10-26T21:13:14-05:00"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hans Rosling - Bubble Chart"/>
+<meta name="twitter:description" content="R MarkdownWhen I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
+  # libraries neededlibrary(tidyverse)library(ggplot2)library(viridis)library(gganimate)library(wbstats)# pull the country data down from the World Bank - three indicatorswbstats::wb(indicator = c(&quot;SP.DYN.LE00.IN&quot;, &quot;NY.GDP.PCAP.CD&quot;, &quot;SP.POP.TOTL&quot;), country = &quot;countries_only&quot;, startdate = 1960, enddate = 2018) %&gt;% # pull down mapping of countries to regions and joindplyr::left_join(wbstats::wbcountries() %&gt;% dplyr::select(iso3c, region)) %&gt;% # spread the three indicatorstidyr::pivot_wider(id_cols = c(&quot;date&quot;, &quot;country&quot;, &quot;region&quot;), names_from = indicator, values_from = value) %&gt;% # plot the dataggplot2::ggplot(aes(x = log(`GDP per capita (current US$)`), y = `Life expectancy at birth, total (years)`,size = `Population, total`)) &#43;ggplot2::geom_point(alpha = 0."/>
+
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+	<link rel="manifest" href="/site.webmanifest">
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="">
+	<link rel="shortcut icon" href="/favicon.ico">
+
+	<title>Hans Rosling - Bubble Chart</title>
+	<link rel="stylesheet" href="/css/style.min.5ee5e7976cd09872c64e40a582206543f6aa38c69a8c43898aadc70040344b92.css" integrity="sha256-XuXnl2zQmHLGTkClgiBlQ/aqOMaajEOJiq3HAEA0S5I=" crossorigin="anonymous">
+	
+</head>
+
+<body id="page">
+	
+	<header id="site-header" class="animated slideInUp faster">
+		<div class="hdr-wrapper section-inner">
+			<div class="hdr-left">
+				<div class="site-branding">
+					<a href="/">Pablo Barajas</a>
+				</div>
+				<nav class="site-nav hide-in-mobile">
+					
+				<a href="/posts/">Posts</a>
+				<a href="/blog/">Blog</a>
+				<a href="/about-hugo/">About</a>
+
+				</nav>
+			</div>
+			<div class="hdr-right hdr-icons">
+				<span class="hdr-social hide-in-mobile"><a href="https://www.linkedin.com/in/pabloibarajas/" target="_blank" rel="noopener me" title="Linkedin"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a><a href="mailto:bar09028@gmail.com" target="_blank" rel="noopener me" title="Email"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></a><a href="https://github.com/barajap1" target="_blank" rel="noopener me" title="Github"><svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg></a></span><button id="menu-btn" class="hdr-btn" title="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+			</div>
+		</div>
+	</header>
+	<div id="mobile-menu" class="animated fast">
+		<ul>
+			<li><a href="/posts/">Posts</a></li>
+			<li><a href="/blog/">Blog</a></li>
+			<li><a href="/about-hugo/">About</a></li>
+		</ul>
+	</div>
+
+
+	<main class="site-main section-inner animated fadeIn faster">
+		<article class="thin">
+			<header class="post-header">
+				<div class="post-meta"><span>Oct 26, 2019</span></div>
+				<h1>Hans Rosling - Bubble Chart</h1>
+			</header>
+			<div class="content">
+				
+
+
+<div id="r-markdown" class="section level2">
+<h2>R Markdown</h2>
+<p>When I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.</p>
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe src="//www.youtube.com/embed/hVimVzgtD6w" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video"></iframe>
+</div>
+
+<pre class="r"><code># libraries needed
+
+library(tidyverse)
+library(ggplot2)
+library(viridis)
+library(gganimate)
+library(wbstats)
+
+
+# pull the country data down from the World Bank - three indicators
+wbstats::wb(indicator = c(&quot;SP.DYN.LE00.IN&quot;, &quot;NY.GDP.PCAP.CD&quot;, &quot;SP.POP.TOTL&quot;), 
+            country = &quot;countries_only&quot;, startdate = 1960, enddate = 2018)  %&gt;% 
+# pull down mapping of countries to regions and join
+dplyr::left_join(wbstats::wbcountries() %&gt;% 
+                   dplyr::select(iso3c, region)) %&gt;% 
+# spread the three indicators
+tidyr::pivot_wider(id_cols = c(&quot;date&quot;, &quot;country&quot;, &quot;region&quot;), names_from = indicator, values_from = value) %&gt;% 
+# plot the data
+ggplot2::ggplot(aes(x = log(`GDP per capita (current US$)`), y = `Life expectancy at birth, total (years)`,
+                    size = `Population, total`)) +
+ggplot2::geom_point(alpha = 0.5, aes(color = region)) +
+ggplot2::scale_size(range = c(.1, 16), guide = FALSE) +
+ggplot2::scale_x_continuous(limits = c(2.5, 12.5)) +
+ggplot2::scale_y_continuous(limits = c(30, 90)) +
+viridis::scale_color_viridis(discrete = TRUE, name = &quot;Region&quot;, option = &quot;viridis&quot;) +
+ggplot2::labs(x = &quot;Log GDP per capita&quot;,
+              y = &quot;Life expectancy at birth&quot;) +
+ggplot2::theme_classic() +
+ggplot2::geom_text(aes(x = 7.5, y = 60, label = date), size = 14, color = &#39;lightgrey&#39;, family = &#39;Oswald&#39;) +
+# animate it over years
+gganimate::transition_states(date, transition_length = 1, state_length = 1) +
+gganimate::ease_aes(&#39;cubic-in-out&#39;)</code></pre>
+<p><img src="/posts/2019-10-26-Hans_Rosling_Bubble_Chart_files/figure-html/unnamed-chunk-2-1.gif" /><!-- --></p>
+<p>I was inspired by Ketih Mcnulty for the code</p>
+</div>
+
+			</div>
+			<hr class="post-end">
+			<footer class="post-info">
+				<p>
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg><span class="tag"><a href="/tags/r-markdown">R Markdown</a></span><span class="tag"><a href="/tags/plot">plot</a></span>
+				</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>221 Words</p>
+				<p><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>2019-10-26 19:13 -0700</p>
+			</footer>
+		</article>
+		<div class="post-nav thin">
+			<a class="next-post" href="/posts/2019-10-26-simpsons_by_gilhenriques/">
+				<span class="post-nav-label"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>&nbsp;Newer</span><br><span>Simpsons by Gil Henriques</span>
+			</a>
+			<a class="prev-post" href="/posts/2019-06-29-kidney_stones_simpsons_paradox/">
+				<span class="post-nav-label">Older&nbsp;<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span><br><span>Kidney Stones and Simpson&#39;s Paradox</span>
+			</a>
+		</div>
+		<div id="comments" class="thin">
+</div>
+	</main>
+
+	<footer id="site-footer" class="section-inner thin animated fadeIn faster">
+		<p>&copy; 2019 <a href="/">Pablo Barajas</a> &#183; <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a></p>
+		<p>
+			Made with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> &#183; Theme <a href="https://github.com/Track3/hermit" target="_blank" rel="noopener">Hermit</a> &#183; <a href="/posts/index.xml" target="_blank" title="rss"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-rss"><path d="M4 11a9 9 0 0 1 9 9"></path><path d="M4 4a16 16 0 0 1 16 16"></path><circle cx="5" cy="19" r="1"></circle></svg></a>
+		</p>
+	</footer>
+
+
+
+	<script src="/js/bundle.min.490e43e5af6db5906f28afa49a4e16bf9f626b758e3fca92f146b870eb94bb37.js" integrity="sha256-SQ5D5a9ttZBvKK+kmk4Wv59ia3WOP8qS8Ua4cOuUuzc=" crossorigin="anonymous"></script>
+	
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-147148594-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+</body>
+
+</html>

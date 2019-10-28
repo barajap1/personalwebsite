@@ -18,14 +18,16 @@
       <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
       
       <guid>/blog/2019-04-19-markdown/</guid>
-      <description>H1 Heading H2 Heading H3 Heading Here&amp;rsquo;s some basic text.
+      <description>Inline styles：
+strong, emphasis, strong and emphasis,code, underline, strikethrough, 😂🤣, $\LaTeX$, $$X^2$$, H~2~O, ==highlight==, Link
+Headings:
+Heading 1 Heading 2 Heading 3 Heading 4 Heading 5 Heading 6 Here&amp;rsquo;s some basic text.
 And here&amp;rsquo;s some italics
 Here&amp;rsquo;s some bold text.
 What about a link?
-Here&amp;rsquo;s a bulleted list: * First item + Second item - Third item
-Here&amp;rsquo;s a numbered list: 1. First 2. Second 3. Third
-A table:
-   Tables Are Cool     col 1 is left-aligned $1600   col 2 is centered $12   col 3 is right-aligned $1    Python code block:</description>
+Here&amp;rsquo;s a bulleted list:
+ First item Second item Third item  Here&amp;rsquo;s a numbered list:
+ First Second Third  Here&amp;rsquo;s an unordered list:</description>
     </item>
     
   </channel>
