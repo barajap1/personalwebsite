@@ -21,6 +21,7 @@ When I was in college taking my first Statistics class our proffesor showed us t
 ```{r, eval=TRUE, echo=FALSE}
 blogdown::shortcode("youtube", "hVimVzgtD6w")
 ```
+It can be recreated in R.
 
 
 ```{r warning = FALSE, error = FALSE, message = FALSE}
@@ -59,4 +60,4 @@ gganimate::ease_aes('cubic-in-out')
   
 ```
 
-I was inspired by Ketih Mcnulty for the code
+Original Code by Keith Mcnulty

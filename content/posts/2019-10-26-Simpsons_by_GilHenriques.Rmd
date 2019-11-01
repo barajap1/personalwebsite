@@ -66,4 +66,4 @@ ggimage::ggbackground(plot, "Images/chalkboard_simpsons.gif", by = "height")
 
 
 ```
-
+Code by Gil Henriques
