@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>R Markdown on Pablo Barajas</title>
@@ -27,8 +27,8 @@
       <pubDate>Sat, 26 Oct 2019 21:13:14 -0500</pubDate>
       
       <guid>/posts/2019-10-26-hans_rosling_bubble_chart/</guid>
-      <description>R MarkdownWhen I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
-   It can be recreated in R.
+      <description>When I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
+  We can do it in R.Code by Keith Mcnulty
 # libraries neededlibrary(tidyverse)library(ggplot2)library(viridis)library(gganimate)library(wbstats)# pull the country data down from the World Bank - three indicatorswbstats::wb(indicator = c(&amp;quot;SP.</description>
     </item>
     

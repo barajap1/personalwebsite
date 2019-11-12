@@ -12,11 +12,10 @@ output:
 
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
 <p>When I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.</p>
-<p>{{% youtube "hVimVzgtD6w" %}}
-It can be recreated in R.</p>
+{{% youtube "hVimVzgtD6w" %}}
+<p>We can do it in R.
+Code by Keith Mcnulty</p>
 <pre class="r"><code># libraries needed
 
 library(tidyverse)
@@ -50,5 +49,3 @@ ggplot2::geom_text(aes(x = 7.5, y = 60, label = date), size = 14, color = &#39;l
 gganimate::transition_states(date, transition_length = 1, state_length = 1) +
 gganimate::ease_aes(&#39;cubic-in-out&#39;)</code></pre>
 <p><img src="/posts/2019-10-26-Hans_Rosling_Bubble_Chart_files/figure-html/unnamed-chunk-2-1.gif" /><!-- --></p>
-<p>Original Code by Keith Mcnulty</p>
-</div>

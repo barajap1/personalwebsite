@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R on Pablo Barajas</title>
+    <link>/tags/r/</link>
+    <description>Recent content in R on Pablo Barajas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Mon, 11 Nov 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/r/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Free Books</title>
+      <link>/blog/free-books/</link>
+      <pubDate>Mon, 11 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/free-books/</guid>
+      <description>The Open Source community is amazing, they do great work and share it freely with the world. I have compiled a list of free books and will continue to update it as I find more.
+ R for Data Science Efficient R programming Creating Websites with R Markdown R Markdown: The Definitive Guide Text Mining with R Happy Git and GitHub for the useR Modern Data Science with R The Unix Workbench Data Visualization - A practical introduction The Art of Data Science Interactive web-based data visualization with R, plotly, and shiny STAT 545 R Programming for Data Science Geocomputation with R Statistical Inference via Data Science Forecasting: Principles and Practice Data Science Live Book Agile Data Science with R Mastering Shiny Introduction to R Data Wrangling with R Data Visualization with ggplot2 Data Visualization with R R, Databases &amp;amp; SQL Advanced R  A great source for finding books: - Here</description>
+    </item>
+    
+  </channel>
+</rss>

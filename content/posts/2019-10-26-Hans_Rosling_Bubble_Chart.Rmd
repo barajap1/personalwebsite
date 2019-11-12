@@ -14,14 +14,15 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
 When I was in college taking my first Statistics class our proffesor showed us the Hans Rosling Ted Talk and I was fascinated by it. Here is the code to recreate part of that talk.
 
 ```{r, eval=TRUE, echo=FALSE}
 blogdown::shortcode("youtube", "hVimVzgtD6w")
 ```
-It can be recreated in R.
+
+We can do it in R.
+Code by Keith Mcnulty
 
 
 ```{r warning = FALSE, error = FALSE, message = FALSE}
@@ -59,5 +60,3 @@ gganimate::transition_states(date, transition_length = 1, state_length = 1) +
 gganimate::ease_aes('cubic-in-out')
   
 ```
-
-Original Code by Keith Mcnulty
