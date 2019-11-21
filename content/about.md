@@ -6,7 +6,7 @@ title: "About"
 {{< figure src="/posts/Images/profilepic.png" alt="image" caption="Pablo" class="left" >}}
 
 I recently completed a Master's Program in Business Analytics from the University of California-Irvine.
-The purpose of this site is to showcase some of my career projects and professional interests and the ocasional random thing, it is a way to keep a record of the things I do and tings I am interested in.
+The purpose of this site is to showcase some of my career projects and professional interests and the ocasional random thing, it is a way to keep a record of the things I do and things I am interested in.
 
 # A little bit about me:
 
