@@ -21,7 +21,7 @@ The purpose of this site is to showcase some of my career projects and professio
     * Got into Crossfit a couple years ago
     * I care about energy and waste 
 
-Some of the Certifications and courses I have completed
+Some of the Certifications and Courses I have completed
 -
 -
 
