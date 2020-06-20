@@ -5,7 +5,7 @@ title: "About"
 
 {{< figure src="/posts/Images/profilepic.png" alt="image" caption="Pablo" class="left" >}}
 
-I recently completed a Master's Program in Business Analytics from the University of California-Irvine.
+I graduated in 2019 with a Master's Program in Business Analytics from the University of California-Irvine.
 The purpose of this site is to showcase some of my career projects and professional interests and the ocasional random thing, it is a way to keep a record of the things I do and things I am interested in.
 
 # A little bit about me:
@@ -36,6 +36,7 @@ Some of the Certifications and courses I have completed
 
 [R Programming Track](https://www.datacamp.com/statement-of-accomplishment/track/ab0aa8dd88cd8934a208039f78204d09f6094f7e)
 
+[SQL Fundamentals Track](https://www.datacamp.com/statement-of-accomplishment/track/7ca48127bee1c2a5b93c0a18ef2a326122320030)
 
 ## Python
 
@@ -51,6 +52,12 @@ Some of the Certifications and courses I have completed
 [Intro to SQL for Data Science](https://drive.google.com/file/d/1N3b3uOgqYAcMqOJXbjbNzb3-mT_CasK1/view?usp=sharing)
 
 [Joining Data in SQL](https://drive.google.com/file/d/13NyRPxkm8V1M8_oBl_jr8T5xdZ51zoCC/view?usp=sharing)
+
+[PostgreSQLSummaryStatsandWindowFunctions](https://www.datacamp.com/statement-of-accomplishment/course/5f96482b9bf5e85b0238c33ffbd76eb67c3fdcc7)
+
+[Functions for Manipulating Data in PostgreSQL](https://www.datacamp.com/statement-of-accomplishment/course/154626db07a5b56c826512166463864e2f6ff135)
+
+[IntermediateSQL](https://www.datacamp.com/statement-of-accomplishment/course/f2b1fcdb6cab63c4c806a1dcaa62347b026ce6bc)
 
 ## R
 [Introduction to R](https://drive.google.com/file/d/1558CVAPYEax9GrTUcUvJcwb3GuC5OAi5/view?usp=sharing)
@@ -88,3 +95,16 @@ Some of the Certifications and courses I have completed
 [Multiple and Logistic Regression](https://drive.google.com/file/d/19O7uuN9NLV86FoDwFSzt7_CC0hyjWbZO/view?usp=sharing)
 
 [Reporting with R Markdown](https://drive.google.com/file/d/1mqlQotpncSqmuBzzdjl6Dcu5a2P8OcVO/view?usp=sharing)
+
+[DataManipulationwithdata.tableinR](https://www.datacamp.com/statement-of-accomplishment/course/149b17a8a47939e95fac0b42f3a257489fefc8d0)
+
+[JoiningDatawithdata.tableinR](https://www.datacamp.com/statement-of-accomplishment/course/cf125c062295c5f30f69e493a15c9b47131ea6ff)
+
+[CommunicatingwithDataintheTidyverse](https://www.datacamp.com/statement-of-accomplishment/course/152f38cf9fcff0025183cbf6301abd82400cfaa8)
+
+[ExperimentalDesigninR](https://www.datacamp.com/statement-of-accomplishment/course/c0e9361272203b5c5d0983b18f591a7349fafb78)
+
+[A/BTestinginR](https://www.datacamp.com/statement-of-accomplishment/course/431b360e44eac043bfe60cf9f58f75a878801b65)
+
+[VisualizingGeospatialDatainR](https://www.datacamp.com/statement-of-accomplishment/course/69926f23bdf444f38b4b352ba101d80c37e2cd50)
+
