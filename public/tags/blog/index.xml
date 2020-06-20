@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>blog on Pablo Barajas</title>
+    <link>/tags/blog/</link>
+    <description>Recent content in blog on Pablo Barajas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>12 Rules for life</title>
+      <link>/blog/2020-060-19-12rulesforlife/</link>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/2020-060-19-12rulesforlife/</guid>
+      <description>Following Jordan Peterson 12 rules for life, I want to write my own. Keeping in mind that these can and will probably change over time which can sound contradictory because rules should not change, but I understand my limitations and understand that people change points of view. So here it goes:
+  Assume your temperament will always be somewhat childish and impatient, and set your rules accordingly, knowing that you cannot abide by rules for rules sake.</description>
+    </item>
+    
+  </channel>
+</rss>

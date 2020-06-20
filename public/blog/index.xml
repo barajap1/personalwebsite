@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 11 Nov 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>12 Rules for life</title>
+      <link>/blog/2020-060-19-12rulesforlife/</link>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/2020-060-19-12rulesforlife/</guid>
+      <description>Following Jordan Peterson 12 rules for life, I want to write my own. Keeping in mind that these can and will probably change over time which can sound contradictory because rules should not change, but I understand my limitations and understand that people change points of view. So here it goes:
+  Assume your temperament will always be somewhat childish and impatient, and set your rules accordingly, knowing that you cannot abide by rules for rules sake.</description>
+    </item>
     
     <item>
       <title>Free Books</title>
@@ -19,7 +29,7 @@
       
       <guid>/blog/free-books/</guid>
       <description>The Open Source community is amazing, they do great work and share it freely with the world. I have compiled a list of free books and will continue to update it as I find more.
- R for Data Science Efficient R programming Creating Websites with R Markdown R Markdown: The Definitive Guide Text Mining with R Happy Git and GitHub for the useR Modern Data Science with R The Unix Workbench Data Visualization - A practical introduction The Art of Data Science Interactive web-based data visualization with R, plotly, and shiny STAT 545 R Programming for Data Science Geocomputation with R Statistical Inference via Data Science Forecasting: Principles and Practice Data Science Live Book Agile Data Science with R Mastering Shiny Introduction to R Data Wrangling with R Data Visualization with ggplot2 Data Visualization with R R, Databases &amp;amp; SQL Advanced R  A great source for finding books: - Here</description>
+ R for Data Science Efficient R programming [Creating Websites with R Markdown] (https://bookdown.org/yihui/blogdown/) R Markdown: The Definitive Guide Text Mining with R Happy Git and GitHub for the useR Modern Data Science with R [The Unix Workbench] (https://seankross.</description>
     </item>
     
     <item>
@@ -57,7 +67,7 @@ And here&amp;rsquo;s some italics
 Here&amp;rsquo;s some bold text.
 What about a link?
 Here&amp;rsquo;s a bulleted list:
- First item Second item Third item  Here&amp;rsquo;s a numbered list:
+ First item   Second item   Third item  Here&amp;rsquo;s a numbered list:
  First Second Third  Here&amp;rsquo;s an unordered list:
  Unordered list item 1.</description>
     </item>

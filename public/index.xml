@@ -7,10 +7,29 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Mon, 11 Nov 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>12 Rules for life</title>
+      <link>/blog/2020-060-19-12rulesforlife/</link>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blog/2020-060-19-12rulesforlife/</guid>
+      <description>Following Jordan Peterson 12 rules for life, I want to write my own. Keeping in mind that these can and will probably change over time which can sound contradictory because rules should not change, but I understand my limitations and understand that people change points of view. So here it goes:
+  Assume your temperament will always be somewhat childish and impatient, and set your rules accordingly, knowing that you cannot abide by rules for rules sake.</description>
+    </item>
+    
+    <item>
+      <title>Website Tutorial</title>
+      <link>/posts/website-tutorial/</link>
+      <pubDate>Sat, 16 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/website-tutorial/</guid>
+      <description>As part of a workshop hosted by the Orange County R User Group (OCRUG) and Merage Analytics Club (MAC), I gave this presentation: Link to the slides here</description>
+    </item>
     
     <item>
       <title>Free Books</title>
@@ -19,7 +38,7 @@
       
       <guid>/blog/free-books/</guid>
       <description>The Open Source community is amazing, they do great work and share it freely with the world. I have compiled a list of free books and will continue to update it as I find more.
- R for Data Science Efficient R programming Creating Websites with R Markdown R Markdown: The Definitive Guide Text Mining with R Happy Git and GitHub for the useR Modern Data Science with R The Unix Workbench Data Visualization - A practical introduction The Art of Data Science Interactive web-based data visualization with R, plotly, and shiny STAT 545 R Programming for Data Science Geocomputation with R Statistical Inference via Data Science Forecasting: Principles and Practice Data Science Live Book Agile Data Science with R Mastering Shiny Introduction to R Data Wrangling with R Data Visualization with ggplot2 Data Visualization with R R, Databases &amp;amp; SQL Advanced R  A great source for finding books: - Here</description>
+ R for Data Science Efficient R programming [Creating Websites with R Markdown] (https://bookdown.org/yihui/blogdown/) R Markdown: The Definitive Guide Text Mining with R Happy Git and GitHub for the useR Modern Data Science with R [The Unix Workbench] (https://seankross.</description>
     </item>
     
     <item>
@@ -90,34 +109,6 @@ Life expectancy at birth can vary along time or between countries because of man
 “It’s not what you preach, it’s what you tolerate.” ― Jocko Willink
 “Don’t expect to be motivated every day to get out there and make things happen. You won’t be. Don’t count on motivation. Count on Discipline.” ― Jocko Willink
 “Care about what other people think and you will always be their prisoner.</description>
-    </item>
-    
-    <item>
-      <title>Peer Influence for a music-streaming company</title>
-      <link>/posts/peer_influence/</link>
-      <pubDate>Tue, 16 Apr 2019 21:13:14 -0500</pubDate>
-      
-      <guid>/posts/peer_influence/</guid>
-      <description>Peer Influence for a music-streaming company# Load relevant packageslibrary(dplyr)library(ggplot2)library(corrplot)library(MatchIt)library(psych)library(GGally)library(gridExtra)#read the datasetHigh_Note &amp;lt;- read.csv(&amp;quot;Data/peer_influence.csv&amp;quot;, header = TRUE)describeBy(High_Note, group = High_Note$adopter, mat = FALSE, digits=2)## ## Descriptive statistics by group ## group: 0## vars n mean sd median trimmed## ï..ID 1 40300 20150.50 11633.75 20150.50 20150.50## age 2 40300 23.95 6.37 23.00 23.09## male 3 40300 0.</description>
-    </item>
-    
-    <item>
-      <title>Markdown</title>
-      <link>/blog/2019-04-19-markdown/</link>
-      <pubDate>Mon, 25 Mar 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/blog/2019-04-19-markdown/</guid>
-      <description>Inline styles：
-strong, emphasis, strong and emphasis,code, underline, strikethrough, 😂🤣, Link
-Headings:
-Heading 1 Heading 2 Heading 3 Heading 4 Heading 5 Heading 6 Here&amp;rsquo;s some basic text.
-And here&amp;rsquo;s some italics
-Here&amp;rsquo;s some bold text.
-What about a link?
-Here&amp;rsquo;s a bulleted list:
- First item Second item Third item  Here&amp;rsquo;s a numbered list:
- First Second Third  Here&amp;rsquo;s an unordered list:
- Unordered list item 1.</description>
     </item>
     
   </channel>

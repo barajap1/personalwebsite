@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GitHub on Pablo Barajas</title>
+    <link>/tags/github/</link>
+    <description>Recent content in GitHub on Pablo Barajas</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Sat, 16 Nov 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/github/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Website Tutorial</title>
+      <link>/posts/website-tutorial/</link>
+      <pubDate>Sat, 16 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/website-tutorial/</guid>
+      <description>As part of a workshop hosted by the Orange County R User Group (OCRUG) and Merage Analytics Club (MAC), I gave this presentation: Link to the slides here</description>
+    </item>
+    
+  </channel>
+</rss>

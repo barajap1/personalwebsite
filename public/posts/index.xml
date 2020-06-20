@@ -6,8 +6,20 @@
 		<generator>Hugo -- gohugo.io</generator>
 		<language>en-us</language>
 		<copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-		<lastBuildDate>Sat, 26 Oct 2019 21:14:14 -0500</lastBuildDate>
+		<lastBuildDate>Sat, 16 Nov 2019 00:00:00 +0000</lastBuildDate>
 		<atom:link href="/posts/index.xml" rel="self" type="application/rss+xml" />
+		
+		<item>
+			<title>Website Tutorial</title>
+			<link>/posts/website-tutorial/</link>
+			<pubDate>Sat, 16 Nov 2019 00:00:00 +0000</pubDate>
+			
+			<guid>/posts/website-tutorial/</guid>
+			<description>As part of a workshop hosted by the Orange County R User Group (OCRUG) and Merage Analytics Club (MAC), I gave this presentation: Link to the slides here</description>
+			<content type="html"><![CDATA[<h2 id="as-part-of-a-workshop-hosted-by-the-orange-county-r-user-group-ocrug-and-merage-analytics-club-mac-i-gave-this-presentation">As part of a workshop hosted by the Orange County R User Group (OCRUG) and Merage Analytics Club (MAC), I gave this presentation:</h2>
+<p>Link to the slides <a href="https://drive.google.com/file/d/1S8TXp9aLy41zA-etOZDREV-c1tTVh43K/view?usp=sharing">here</a></p>
+]]></content>
+		</item>
 		
 		<item>
 			<title>Simpsons by Gil Henriques</title>
